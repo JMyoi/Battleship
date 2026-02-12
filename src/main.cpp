@@ -1,109 +1,44 @@
-#include <iostream>
-#include <limits>
-#include "Game.h"
+#include "raylib.h"
 
-static void ClearInput() {
-    std::cin.clear();
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
-}
+//------------------------------------------------------------------------------------
+// Program main entry point
+//------------------------------------------------------------------------------------
+int main(void)
+{
+    // Initialization
+    //--------------------------------------------------------------------------------------
+    const int screenWidth = 800;
+    const int screenHeight = 450;
 
-static Direction ReadDirection() {
-    while (true) {
-        char ch;
-        std::cout << "Direction (H/V): ";
-        if (!(std::cin >> ch)) {
-            ClearInput();
-            continue;
-        }
-        if (ch == 'H' || ch == 'h') return Direction::Horizontal;
-        if (ch == 'V' || ch == 'v') return Direction::Vertical;
+    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
 
-        std::cout << "Invalid input. Enter H or V.\n";
-    }
-}
+    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
+    //--------------------------------------------------------------------------------------
 
-static Position ReadPosition(const char* prompt) {
-    while (true) {
-        int r, c;
-        std::cout << prompt << " (row col 0-9 0-9): ";
-        if (!(std::cin >> r >> c)) {
-            ClearInput();
-            continue;
-        }
-        return Position{r, c};
-    }
-}
+    // Main game loop
+    while (!WindowShouldClose())    // Detect window close button or ESC key
+    {
+        // Update
+        //----------------------------------------------------------------------------------
+        // TODO: Update your variables here
+        //----------------------------------------------------------------------------------
 
-static void PrintShot(const ShotResult& r) {
-    switch (r.type) {
-        case ShotResultType::Invalid:
-            std::cout << "Invalid position.\n";
-            break;
-        case ShotResultType::AlreadyTried:
-            std::cout << "Already tried.\n";
-            break;
-        case ShotResultType::Miss:
-            std::cout << "Miss.\n";
-            break;
-        case ShotResultType::Hit:
-            std::cout << "Hit!\n";
-            break;
-        case ShotResultType::Sunk:
-            std::cout << "Sunk! Ship index: " << r.sunkShipIndex << "\n";
-            break;
-        default:
-            break;
-    }
-}
+        // Draw
+        //----------------------------------------------------------------------------------
+        BeginDrawing();
 
-int main() {
-    std::cout << "=== Battleship (CLI Version) ===\n";
+            ClearBackground(RAYWHITE);
 
-    int shipCount;
-    std::cout << "Enter number of ships (1-5): ";
-    if (!(std::cin >> shipCount)) return 0;
+            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
 
-    Game game(shipCount);
-
-    // Setup Phase
-    while (game.state() == GameState::SetupP1 ||
-           game.state() == GameState::SetupP2) {
-
-        int current = game.currentPlayerIndex();
-        static int placedP1 = 0;
-        static int placedP2 = 0;
-
-        int shipIndex = (current == 0) ? placedP1 : placedP2;
-        int shipSize = shipIndex + 1;
-
-        std::cout << "\n--- Player " << (current + 1)
-                  << " place ship of size " << shipSize << " ---\n";
-
-        Position start = ReadPosition("Start position");
-        Direction dir = ReadDirection();
-
-        if (game.placeNextShip(start, dir)) {
-            std::cout << "Placed successfully.\n";
-            if (current == 0) placedP1++;
-            else placedP2++;
-        } else {
-            std::cout << "Invalid placement. Try again.\n";
-        }
+        EndDrawing();
+        //----------------------------------------------------------------------------------
     }
 
-    // Turn Phase
-    while (!game.isOver()) {
-        int current = game.currentPlayerIndex();
-        std::cout << "\n=== Player " << (current + 1) << " Turn ===\n";
-
-        Position target = ReadPosition("Fire at");
-        ShotResult result = game.fire(target);
-        PrintShot(result);
-    }
-
-    std::cout << "\n*** Game Over! Winner: Player "
-              << (game.winnerIndex() + 1)
-              << " ***\n";
+    // De-Initialization
+    //--------------------------------------------------------------------------------------
+    CloseWindow();        // Close window and OpenGL context
+    //--------------------------------------------------------------------------------------
 
     return 0;
 }

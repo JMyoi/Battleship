@@ -38,7 +38,7 @@ void Ship::setCells(const std::vector<Position>& positions) {
 
 /* Register a hit if p is part of this ship and not previously hit. */
 bool Ship::registerHit(Position p) {
-    for (size_t i = 0; i < m_cells.size(); ++i) {
+    for (std::size_t i = 0; i < m_cells.size(); ++i) {
         if (m_cells[i].r == p.r && m_cells[i].c == p.c) {
             if (!m_hitMask[i]) {
                 m_hitMask[i] = true;
