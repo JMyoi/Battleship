@@ -4,3 +4,4 @@ main
 *.o
 *.exe
 battleship
+.vscode/
