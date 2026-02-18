@@ -10,12 +10,18 @@ int main()
     
     Ball ball;
     
-    InitWindow(screenWidth, screenHeight, "My first RAYLIB program!");
+    InitWindow(screenWidth, screenHeight, "B*ttleSh*p");
+
     SetTargetFPS(60);
     
     while (!WindowShouldClose())
     {
+        //1, Event handling
+
+
+        //2. update
         ball.Update();
+        //3. Draw
         
         BeginDrawing();
             ClearBackground(darkGreen);
