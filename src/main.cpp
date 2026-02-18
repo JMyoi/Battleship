@@ -1,33 +1,36 @@
-#include <raylib.h>
-#include "ball.h"
+#include "raylib.h"
+#include <iostream>
+#include "Board.hpp"
+using namespace std;
 
-int main() 
+
+int main(void)
 {
-    const Color darkGreen = {20, 160, 133, 255};
+    // Initialization
+    const int screenWidth = 1000;
+    const int screenHeight = 600;
     
-    constexpr int screenWidth = 800;
-    constexpr int screenHeight = 600;
-    
-    Ball ball;
-    
-    InitWindow(screenWidth, screenHeight, "B*ttleSh*p");
-
+    InitWindow(screenWidth, screenHeight, "Battleship");
     SetTargetFPS(60);
+    Board b;
     
     while (!WindowShouldClose())
     {
         //1, Event handling
-
-
         //2. update
-        ball.Update();
+
         //3. Draw
-        
         BeginDrawing();
-            ClearBackground(darkGreen);
-            ball.Draw();
+
+            ClearBackground(RAYWHITE);
+            b.Draw(Vector2{10,10}, Vector2{500,500});
+
+
         EndDrawing();
     }
-    
-    CloseWindow();
+
+    // De-Initialization
+    CloseWindow();        
+
+    return 0;
 }
