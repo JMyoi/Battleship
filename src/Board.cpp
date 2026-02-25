@@ -1,6 +1,7 @@
 #include "Board.hpp"
 #include "raylib.h"
 #include <vector>
+#include <iostream>
 using namespace std;
 
 //Tile Implementation
@@ -31,6 +32,7 @@ void Board::Draw(Vector2 start, Vector2 end){
     float TileHeight = BoardHeight / 10;
     float TileX = start.x;
     float TileY = start.y;
+    cout<<"TileWidth: " << TileWidth << " TileHeight: " << TileHeight << endl;
 
     // assign all tiles appropriate width, height and position
     for(int row = 0; row<10; row++){

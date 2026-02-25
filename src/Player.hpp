@@ -8,6 +8,8 @@ using namespace std;
 class Player{
     public:
         Player(int shipCount);
+        void drawSetupBoard();
+        
 
     private:
         Board playerBoard;

@@ -22,9 +22,15 @@ int main(void)
 
         //3. Draw
         BeginDrawing();
-
             ClearBackground(RAYWHITE);
-            
+            switch(GameState state = game.getGameState()){
+                case GameState::Menu:
+                    game.drawMenu();
+                    break;
+                case GameState::SetupP1:
+                    game.drawSetup();
+                    break;
+            }
 
 
         EndDrawing();
