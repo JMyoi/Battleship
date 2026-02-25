@@ -1,6 +1,6 @@
 #include "raylib.h"
 #include <iostream>
-#include "Board.hpp"
+#include "Game.hpp"
 using namespace std;
 
 
@@ -12,18 +12,19 @@ int main(void)
     
     InitWindow(screenWidth, screenHeight, "Battleship");
     SetTargetFPS(60);
-    Board b;
+    Game game;
     
     while (!WindowShouldClose())
     {
         //1, Event handling
+
         //2. update
 
         //3. Draw
         BeginDrawing();
 
             ClearBackground(RAYWHITE);
-            b.Draw(Vector2{10,10}, Vector2{500,500});
+            
 
 
         EndDrawing();
