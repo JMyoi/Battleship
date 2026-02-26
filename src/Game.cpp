@@ -3,7 +3,12 @@
 #include "vector"
 using namespace std;
 
-int selectedOption = -1;
+int selectedOption = -1; // for main menu ship selection, -1 means no option selected
+
+Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(5) {
+    // Initialize game state, players, and any other necessary components
+
+}
 
 int getSelectedOption(vector<Rectangle>& options){
     Vector2 mousePos = GetMousePosition();
@@ -16,11 +21,6 @@ int getSelectedOption(vector<Rectangle>& options){
         }
     }
     return selectedOption;
-
-}
-
-Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(5) {
-    // Initialize game state, players, and any other necessary components
 
 }
 
@@ -53,21 +53,16 @@ void Game::drawMenu() {
 
     // start button
     Rectangle startButton = {450, 350, 100, 50};
-    if(CheckCollisionPointRec(mousePos, startButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        if(selectedOption != -1){
-            NoOfShips = selectedOption + 1;
-            // Handle selected option here
-        }
-    }
+
     DrawRectangleRec(startButton, LIGHTGRAY);
     DrawText("Start", startButton.x + 20, startButton.y + 10, 20, BLACK);
     // handle start game click will change state to setup and pass NoOfShips to players
     if(CheckCollisionPointRec(mousePos, startButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
         if(selectedOption != -1){
+            NoOfShips = selectedOption + 1;
             state = GameState::SetupP1;
             player1 = Player(NoOfShips);
             player2 = Player(NoOfShips);
-            // Handle selected option here
         }
     }
 

@@ -21,7 +21,8 @@ class Ship{
         int size;
         vector<bool> hitMask; // going from right to left or top down
         vector<position> positions;
-        vector<Rectangle> shipSprite; // for drawing the ship, will be set to the appropriate position and size when the ship is placed
+        //direction
+        Rectangle shipRect; // for drawing the ship, will be set to the appropriate position and size when the ship is placed
 
 
 };
