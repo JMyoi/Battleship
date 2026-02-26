@@ -1,44 +1,39 @@
 #include "raylib.h"
+#include <iostream>
+using namespace std;
 
-//------------------------------------------------------------------------------------
-// Program main entry point
-//------------------------------------------------------------------------------------
 int main(void)
 {
     // Initialization
-    //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 450;
 
-    InitWindow(screenWidth, screenHeight, "raylib [core] example - basic window");
+    InitWindow(1920, 1080, "Battleship");
+    const char *ImagePath = "./src/CNY.png";
+    //Texture2D CNY = LoadTexture(ImagePath);
+    Image CNYImage = LoadImage(ImagePath);
+    Image* C = new Image(CNYImage);
+    ImageResize(&CNYImage, 200, 200); // we could just pass the &CNYImage by address, instead of makking another variable in heap.
+    Texture2D CNYImg = LoadTextureFromImage(CNYImage);
 
-    SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
-    //--------------------------------------------------------------------------------------
+    SetTargetFPS(60);              
 
-    // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        // Update
-        //----------------------------------------------------------------------------------
-        // TODO: Update your variables here
-        //----------------------------------------------------------------------------------
-
-        // Draw
-        //----------------------------------------------------------------------------------
+        //Event handling
+        // Update, variables, objects, position.
+        cout<<IsKeyDown(KEY_A)<<endl;
+       
+        // Draw the udpated outputs to screen.
         BeginDrawing();
-
+            DrawFPS(10, 10);
             ClearBackground(RAYWHITE);
-
-            DrawText("Congrats! You created your first window!", 190, 200, 20, LIGHTGRAY);
+            DrawTexture(CNYImg, 0, 0, WHITE); 
 
         EndDrawing();
-        //----------------------------------------------------------------------------------
     }
 
     // De-Initialization
-    //--------------------------------------------------------------------------------------
+    delete C;
     CloseWindow();        // Close window and OpenGL context
-    //--------------------------------------------------------------------------------------
 
     return 0;
 }

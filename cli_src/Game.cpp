@@ -13,6 +13,7 @@ Game::Game(int shipCount)
 }
 
 GameState Game::state() const { return m_state; }
+
 int Game::currentPlayerIndex() const {
     if (m_state == GameState::SetupP1 || m_state == GameState::TurnP1) return 0;
     if (m_state == GameState::SetupP2 || m_state == GameState::TurnP2) return 1;
