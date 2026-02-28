@@ -3,22 +3,25 @@
 
 using namespace std;
 
-int getSelectedOption(vector<Rectangle>& options);
 
 enum class GameState { Menu, 
-    SetupP1, SetupTransitionP2, SetupP2, P1Transition, 
-    TurnP1, P2Transition, TurnP2, 
+    SetupP1, SetupP2,
+    P1Transition, P2Transition,
+    TurnP1, TurnP2, 
     GameOver };
 
 
 class Game{
     public:
         Game();
-        void updateGameState(GameState newState);
         GameState getGameState();
         void drawMenu();
-        void drawSetup();
-        void drawGame();
+        void drawP1Setup();
+        void drawP2Setup();
+        void drawP1Transition();
+        void drawP2Transition();
+        void drawP1Turn();
+        void drawP2Turn();
         void drawGameOver();
 
     private:
@@ -26,6 +29,11 @@ class Game{
         Player player2;
         GameState state;
         int NoOfShips;
+
+        int getSelectedOption(vector<Rectangle>& options);
+        void updateGameState(GameState newState);
+
+
         
 
 };

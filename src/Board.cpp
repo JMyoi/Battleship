@@ -7,7 +7,7 @@ using namespace std;
 //Tile Implementation
 
 Tile::Tile(){
-    rect = {0,0,0,0}; // width and height should be 50. 
+    rect = {0,0,0,0}; 
     state = TileState::Empty;
 }
 
@@ -31,8 +31,6 @@ Board::Board(){
 
 //draws the players board, 
 void Board::Draw(Vector2 start){
-    // float BoardWidth = 500; // 500
-    // float BoardHeight = 500; // 500
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
     float TileHeight = 50; // 50
     float TileX = start.x;  
@@ -52,11 +50,5 @@ void Board::Draw(Vector2 start){
         }
         TileY += TileHeight;  // Move to next row
     }
-
-    // for(int row = 0; row<10; row++){
-    //     for(int col = 0; col<10; col++){
-    //         grid.at(row).at(col).Draw();
-    //     }
-    // }
 
 }

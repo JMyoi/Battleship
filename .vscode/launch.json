@@ -86,8 +86,8 @@
       "args": [],
       "stopAtEntry": false,
       "externalConsole": true,
-      "cwd": "c:/Users/jaych/School/Battleship/cli_src",
-      "program": "c:/Users/jaych/School/Battleship/cli_src/build/Debug/outDebug",
+      "cwd": "c:/Users/jaych/School/Battleship/src",
+      "program": "c:/Users/jaych/School/Battleship/src/build/Debug/outDebug",
       "MIMode": "gdb",
       "miDebuggerPath": "gdb",
       "setupCommands": [

@@ -15,7 +15,6 @@ class Ship{
     public:
         Ship(int size);
         void setPosition(vector<position> newPositions);
-        //void setShipPosition();
         void drawShip(int i, Vector2 newPos);
 
 
