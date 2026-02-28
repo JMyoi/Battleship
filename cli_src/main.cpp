@@ -24,13 +24,28 @@ static Direction ReadDirection() {
 
 static Position ReadPosition(const char* prompt) {
     while (true) {
-        int r, c;
-        std::cout << prompt << " (row col 0-9 0-9): ";
-        if (!(std::cin >> r >> c)) {
+        char colChar;
+        int row;
+
+        std::cout << prompt << " (e.g. A 1 to J 10): ";
+
+        if (!(std::cin >> colChar >> row)) {
             ClearInput();
             continue;
         }
-        return Position{r, c};
+
+        // Convert column letter to index (A-J -> 0-9)
+        colChar = toupper(colChar);
+        int c = colChar - 'A';
+
+        // Convert row 1-10 to 0-9
+        int r = row - 1;
+
+        if (c >= 0 && c < BOARD_SIZE && r >= 0 && r < BOARD_SIZE) {
+            return Position{r, c};
+        }
+
+        std::cout << "Invalid input. Use A-J and 1-10.\n";
     }
 }
 

@@ -1,39 +1,40 @@
 #include "raylib.h"
 #include <iostream>
+#include "Game.hpp"
 using namespace std;
+
 
 int main(void)
 {
-    // Initialization
+    const int screenWidth = 1150;
+    const int screenHeight = 800;
+    InitWindow(screenWidth, screenHeight, "Battleship");
 
-    InitWindow(1920, 1080, "Battleship");
-    const char *ImagePath = "./src/CNY.png";
-    //Texture2D CNY = LoadTexture(ImagePath);
-    Image CNYImage = LoadImage(ImagePath);
-    Image* C = new Image(CNYImage);
-    ImageResize(&CNYImage, 200, 200); // we could just pass the &CNYImage by address, instead of makking another variable in heap.
-    Texture2D CNYImg = LoadTextureFromImage(CNYImage);
-
-    SetTargetFPS(60);              
-
-    while (!WindowShouldClose())    // Detect window close button or ESC key
+    SetTargetFPS(60);
+    Game game;
+    
+    while (!WindowShouldClose())
     {
-        //Event handling
-        // Update, variables, objects, position.
-        cout<<IsKeyDown(KEY_A)<<endl;
-       
-        // Draw the udpated outputs to screen.
+        //1, Event handling and update
+
+        //2. Draw
         BeginDrawing();
-            DrawFPS(10, 10);
             ClearBackground(RAYWHITE);
-            DrawTexture(CNYImg, 0, 0, WHITE); 
+            switch(GameState state = game.getGameState()){
+                case GameState::Menu:
+                    game.drawMenu();
+                    break;
+                case GameState::SetupP1:
+                    game.drawSetup();
+                    break;
+            }
+
 
         EndDrawing();
     }
 
     // De-Initialization
-    delete C;
-    CloseWindow();        // Close window and OpenGL context
+    CloseWindow();        
 
     return 0;
 }

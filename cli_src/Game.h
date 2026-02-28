@@ -37,7 +37,7 @@ private:
     GameState m_state;
     int m_nextShipToPlace; // 0..shipCount-1 within current setup phase
     int m_winner;
-
+    // add a turn variable that either holds player 1 or 2.
     Player m_p1;
     Player m_p2;
 };
