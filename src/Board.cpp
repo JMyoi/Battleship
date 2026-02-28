@@ -1,5 +1,6 @@
 #include "Board.hpp"
 #include "raylib.h"
+#include "Ship.hpp"
 #include <vector>
 #include <iostream>
 using namespace std;
@@ -58,9 +59,11 @@ void Board::Draw(Vector2 start){
 
 }
 
-bool Board::HandlePlaceShip(int shipSize){
+//returns the positions where it was placed.
+bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions){
     for(int row = 0; row<10; row++){
         for(int col = 0; col<10; col++){
+
             if(grid.at(row).at(col).isClicked()){
                 //is this tile empty and there is no ship on it, then maybe we can place it.
                 if(grid.at(row).at(col).state == TileState::Empty){
@@ -85,6 +88,9 @@ bool Board::HandlePlaceShip(int shipSize){
                         X = row; // reset X
                         for(int i = 0; i<shipSize; i++){
                             grid.at(X).at(Y).state = TileState::Ship;
+                            newPositions.at(i).row = X;
+                            newPositions.at(i).col = Y;
+                            newPositions.at(i).hit = false;
                             cout<<"Ship is placed at: ("<<X<<", "<<Y<<")"<<endl;
                             X++;
                         }

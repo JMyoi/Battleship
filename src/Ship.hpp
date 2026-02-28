@@ -17,9 +17,11 @@ class Ship{
 
     public:
         Ship(int size);
-        void setPosition(vector<position> newPositions);
+        void setShip(const vector<position>& newPositions);// if a ship is placed on the board this is called to set the ships position and direction.
         void drawShip(Vector2 newPos);
+        void draw(); // draw the ship that has a position set from placement. 
         bool shipClicked();
+        bool isPlaced();
 
 
     private:

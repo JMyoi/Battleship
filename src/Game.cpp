@@ -68,6 +68,7 @@ void Game::drawP1Setup(){
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     player1.drawSetupBoard();
     
+    // should update state after the player puts a ship on board.
 }
 
 //private helper functions.

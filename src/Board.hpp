@@ -1,5 +1,6 @@
 #pragma once
 #include "raylib.h"
+#include "Ship.hpp"
 #include <vector>
 using namespace std;
 
@@ -20,7 +21,7 @@ class Board{
     public:
         Board();
         void Draw(Vector2 start); 
-        bool HandlePlaceShip(int shipSize); // returns true if the ship is placed and false if not.
+        bool HandlePlaceShip(int shipSize, vector<position>& newPositions); // returns true if the ship is placed and false if not.
     private:
         vector<vector<Tile>> grid; // 2D grid of tiles
 

@@ -1,4 +1,5 @@
 #include "Player.hpp"
+#include "Ship.hpp"
 
 using namespace std;
 
@@ -23,8 +24,11 @@ void Player::drawSetupBoard(){
         if(ships.at(i).shipClicked() || selectedShip == i){ // if a ship is clicked then it should not be displayed but it should follow the cursor.
             selectedShip = i;
         }else{
-            ships.at(i).drawShip(shipStart);
-            shipStart.x += 60; // space out the ships vertically
+            //if the ship is not placed then we should display for placement.
+            if(!ships.at(i).isPlaced()){
+                ships.at(i).drawShip(shipStart);
+                shipStart.x += 60; // space out the ships vertically
+            }
         }
     }
     // handle click and drag of ships
@@ -32,15 +36,21 @@ void Player::drawSetupBoard(){
     player clicks a ship and the ship pos = mouse cursor
     player clicks on an area on the board and verifies if it can be placed.
     */
-    // board placement detection.
+    // ship placement on board detection.
     if(selectedShip>=0){
         ships.at(selectedShip).drawShip(GetMousePosition());
-        if(playerBoard.HandlePlaceShip(selectedShip+1)){
+        vector<position> newPositions(selectedShip+1);
+        if(playerBoard.HandlePlaceShip(selectedShip+1, newPositions)){
+            // update the players respective ships position.
+            ships.at(selectedShip).setShip(newPositions);
             selectedShip = -1; // deselect after successful placement
         }
     }
 
 
+}
 
-    
+void Player::drawShipsonBoard(){
+    // should draw the ships on the board if there are any ships that are placed on the board.
+    //the above funciton should call this one to display ships that are already placed.
 }

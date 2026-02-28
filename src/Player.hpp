@@ -11,6 +11,8 @@ class Player{
     public:
         Player(int shipCount);
         void drawSetupBoard();
+        void drawShipsonBoard();
+        
         
     private:
         Board playerBoard;

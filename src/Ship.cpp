@@ -8,7 +8,7 @@ Ship::Ship(int size){
     this->size = size;
     int height = 50*size;
     shipRect = {0, 0, 50, float(height)};
-    positions.reserve(size);
+    positions.resize(size);
     for(int i = 0; i< positions.size(); i++){
         positions.at(i).hit = false;
         positions.at(i).row = -1;
@@ -23,6 +23,7 @@ void Ship::drawShip(Vector2 newPos){
     shipRect.y = newPos.y;
     DrawRectangleRec(shipRect, GRAY);
 }
+
 bool Ship::shipClicked(){
     if(CheckCollisionPointRec(GetMousePosition(),shipRect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         return true;
@@ -30,7 +31,26 @@ bool Ship::shipClicked(){
     return false;
 }
 
-
-void Ship::setPosition(vector<position> newPositions){
+void Ship::setShip(const vector<position>& newPositions){
+    cout<<"Setting New Ship Positions of size: "<<newPositions.size()<<"should be same size as: "<<size<<endl;
     positions = newPositions;
+    //update x and y of rectangle based on where the first position is.
+    float newX = 50 + newPositions.at(0).row * 50;
+    float newY = 50 + newPositions.at(0).col * 50;
+    shipRect.x = newX;
+    shipRect.y = newY;
+    cout<<"the ships position is now: "<<shipRect.x<<", "<<shipRect.y<<endl;
+
 }
+
+bool Ship::isPlaced(){
+    if(positions.at(0).row != -1)
+        return true;
+    return false;
+}
+
+void Ship::draw(){
+    // draw the ship that has a position set from placement. 
+    
+}
+
