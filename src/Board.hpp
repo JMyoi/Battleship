@@ -13,12 +13,14 @@ class Tile{
         // member funcitons
         Tile();
         void Draw();
+        bool isClicked();
 };
 
 class Board{
     public:
         Board();
         void Draw(Vector2 start); 
+        bool HandlePlaceShip(int shipSize); // returns true if the ship is placed and false if not.
     private:
         vector<vector<Tile>> grid; // 2D grid of tiles
 

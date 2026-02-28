@@ -11,7 +11,7 @@ Player::Player(int shipCount){
     // initialize name
 }
 
-
+int selectedShip = -1;
 void Player::drawSetupBoard(){
     // draw the player's board
     Vector2 start = {50, 50};
@@ -20,15 +20,27 @@ void Player::drawSetupBoard(){
     //draw rectangular ships on the side that can be dragged and dropped onto the board
     Vector2 shipStart = {600, 50};
     for(int i = 0; i < ships.size(); i++){
-        ships.at(i).drawShip(i, shipStart);
-        shipStart.x += 60; // space out the ships vertically
+        if(ships.at(i).shipClicked() || selectedShip == i){ // if a ship is clicked then it should not be displayed but it should follow the cursor.
+            selectedShip = i;
+        }else{
+            ships.at(i).drawShip(shipStart);
+            shipStart.x += 60; // space out the ships vertically
+        }
     }
     // handle click and drag of ships
     /*
-    if collision of mouse point and rectangle of ship and left mouse is clicked then hover.
-    ships rectangle position x and y is set to getMousePosition().
-    
-    // collision handling of ship. 
+    player clicks a ship and the ship pos = mouse cursor
+    player clicks on an area on the board and verifies if it can be placed.
     */
+    // board placement detection.
+    if(selectedShip>=0){
+        ships.at(selectedShip).drawShip(GetMousePosition());
+        if(playerBoard.HandlePlaceShip(selectedShip+1)){
+            selectedShip = -1; // deselect after successful placement
+        }
+    }
+
+
+
     
 }

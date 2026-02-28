@@ -14,6 +14,11 @@ Tile::Tile(){
 void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
 }
+bool Tile::isClicked(){
+    if(CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
+        return true;
+    return false;
+}
 
 
 //Board Implementation
@@ -51,4 +56,48 @@ void Board::Draw(Vector2 start){
         TileY += TileHeight;  // Move to next row
     }
 
+}
+
+bool Board::HandlePlaceShip(int shipSize){
+    for(int row = 0; row<10; row++){
+        for(int col = 0; col<10; col++){
+            if(grid.at(row).at(col).isClicked()){
+                //is this tile empty and there is no ship on it, then maybe we can place it.
+                if(grid.at(row).at(col).state == TileState::Empty){
+                    bool canPlace = true;
+                    int X = row, Y = col;
+                    // detect if the other parts of the ship are out of bound, !empty, or has a ship already.
+                    // to access the vertical directions index, we do x+1, for shipSize-1 times.
+                    for(int i = 0; i<shipSize-1; i++){
+                        X++; // for vertical placement col does not change, only X, row.
+                        bool outOfBound = X>=10;
+                        // check for not out of bound and tile is empty.
+                        if((!outOfBound) && (grid.at(X).at(Y).state == TileState::Empty)){
+                            // all conditions met, canPlace remains true
+                            }
+                        else{
+                            cout<<"ship cannot be placed, either out of bound or ship already there.\n";
+                            return canPlace = false; 
+                        }
+                    }
+                    if(canPlace){
+                        // place ship on board, update tile states to ship.
+                        X = row; // reset X
+                        for(int i = 0; i<shipSize; i++){
+                            grid.at(X).at(Y).state = TileState::Ship;
+                            cout<<"Ship is placed at: ("<<X<<", "<<Y<<")"<<endl;
+                            X++;
+                        }
+                        return true;
+                    }
+                    // detect if ship trying to be placed is colliding with other ships that are already placed.
+                    //edgecase? shipsize is one.
+                }else{
+                    cout<<"ship cannot be placed ship already there.\n";
+                    return false;
+                }
+            }
+        }
+    }
+    return false;
 }

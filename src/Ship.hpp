@@ -8,6 +8,9 @@ struct position{
     int col;
     bool hit;// for if that ship unit is hit or miss, 
 };
+enum class Direction {
+    Horizontal, Vertical
+};
 
 
 class Ship{
@@ -15,7 +18,8 @@ class Ship{
     public:
         Ship(int size);
         void setPosition(vector<position> newPositions);
-        void drawShip(int i, Vector2 newPos);
+        void drawShip(Vector2 newPos);
+        bool shipClicked();
 
 
     private:

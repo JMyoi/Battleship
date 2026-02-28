@@ -18,11 +18,18 @@ Ship::Ship(int size){
 }
 
 // draws ship for setup phase
-void Ship::drawShip(int i, Vector2 newPos){
+void Ship::drawShip(Vector2 newPos){
     shipRect.x = newPos.x;
     shipRect.y = newPos.y;
     DrawRectangleRec(shipRect, GRAY);
 }
+bool Ship::shipClicked(){
+    if(CheckCollisionPointRec(GetMousePosition(),shipRect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
+        return true;
+    }
+    return false;
+}
+
 
 void Ship::setPosition(vector<position> newPositions){
     positions = newPositions;

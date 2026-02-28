@@ -64,7 +64,7 @@ GameState Game::getGameState(){
 
 void Game::drawP1Setup(){
     // draw player 1 setup screen
-    const char* p1text = "Player 1, place your ships";
+    const char* p1text = "Player 1, place a ship";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     player1.drawSetupBoard();
     
