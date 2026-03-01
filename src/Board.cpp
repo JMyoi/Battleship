@@ -60,7 +60,7 @@ void Board::Draw(Vector2 start){
 }
 
 //returns the positions where it was placed.
-bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions){
+bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction){
     for(int row = 0; row<10; row++){
         for(int col = 0; col<10; col++){
 
@@ -68,36 +68,69 @@ bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions){
                 //is this tile empty and there is no ship on it, then maybe we can place it.
                 if(grid.at(row).at(col).state == TileState::Empty){
                     bool canPlace = true;
-                    int X = row, Y = col;
+                    int currRow = row, currCol = col;
                     // detect if the other parts of the ship are out of bound, !empty, or has a ship already.
-                    // to access the vertical directions index, we do x+1, for shipSize-1 times.
-                    for(int i = 0; i<shipSize-1; i++){
-                        X++; // for vertical placement col does not change, only X, row.
-                        bool outOfBound = X>=10;
-                        // check for not out of bound and tile is empty.
-                        if((!outOfBound) && (grid.at(X).at(Y).state == TileState::Empty)){
-                            // all conditions met, canPlace remains true
+                    //for the respective direction, vertical or horizontal
+                    if(direction == Direction::Vertical){
+                        for(int i = 0; i<shipSize-1; i++){
+                            // to access the vertical directions index, we do x+1, for shipSize-1 times.
+                            currRow++; // for vertical placement col does not change, only X, row.
+                            bool outOfBound = currRow>=10;
+                            // check for not out of bound and tile is empty.
+                            if((!outOfBound) && (grid.at(currRow).at(col).state == TileState::Empty)){
+                                // all conditions met, canPlace remains true
+                                }
+                            else{
+                                cout<<"ship cannot be placed, either out of bound or ship already there.\n";
+                                return canPlace = false; 
                             }
-                        else{
-                            cout<<"ship cannot be placed, either out of bound or ship already there.\n";
-                            return canPlace = false; 
                         }
-                    }
-                    if(canPlace){
-                        // place ship on board, update tile states to ship.
-                        X = row; // reset X
-                        for(int i = 0; i<shipSize; i++){
-                            grid.at(X).at(Y).state = TileState::Ship;
-                            newPositions.at(i).row = X;
-                            newPositions.at(i).col = Y;
-                            newPositions.at(i).hit = false;
-                            cout<<"Ship is placed at: ("<<X<<", "<<Y<<")"<<endl;
-                            X++;
+                        if(canPlace){
+                            // place ship on board, update tile states to ship.
+                            currRow = row; // reset X
+                            for(int i = 0; i<shipSize; i++){
+                                grid.at(currRow).at(col).state = TileState::Ship;
+                                newPositions.at(i).row = currRow;
+                                newPositions.at(i).col = col;
+                                newPositions.at(i).hit = false;
+                                cout<<"Ship is placed at: Row:"<<currRow<<", Col: "<<col<<endl;
+                                currRow++;
+                            }
+                            return true;
                         }
-                        return true;
+                        // detect if ship trying to be placed is colliding with other ships that are already placed.
+                        //edgecase? shipsize is one.
                     }
-                    // detect if ship trying to be placed is colliding with other ships that are already placed.
-                    //edgecase? shipsize is one.
+                    else if(direction == Direction::Horizontal){
+                         for(int i = 0; i<shipSize-1; i++){
+                            // to access the vertical directions index, we do curCol+1, for shipSize-1 times.
+                            currCol++; 
+                            bool outOfBound = currCol>=10;
+                            // check for not out of bound and tile is empty.
+                            if((!outOfBound) && (grid.at(row).at(currCol).state == TileState::Empty)){
+                                // all conditions met, canPlace remains true
+                                }
+                            else{
+                                cout<<"ship cannot be placed, either out of bound or ship already there.\n";
+                                return canPlace = false; 
+                            }
+                        }
+                        if(canPlace){
+                            // place ship on board, update tile states to ship.
+                            currCol = col; // reset X
+                            for(int i = 0; i<shipSize; i++){
+                                grid.at(row).at(currCol).state = TileState::Ship;
+                                newPositions.at(i).row = row;
+                                newPositions.at(i).col = currCol;
+                                newPositions.at(i).hit = false;
+                                cout<<"Ship is placed at: Row: "<<row<<" Col: "<<currCol<<endl;
+                                currCol++;
+                            }
+                            return true;
+                        }
+                        
+                    }
+
                 }else{
                     cout<<"ship cannot be placed ship already there.\n";
                     return false;
