@@ -10,6 +10,9 @@ int selectedOption = -1;
 //constructor
 Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(-1) {}
 
+GameState Game::getGameState(){
+    return state;
+}
 
 void Game::drawMenu() {
 
@@ -58,21 +61,24 @@ void Game::drawMenu() {
 }
 
 
-GameState Game::getGameState(){
-    return state;
-}
+
 
 void Game::drawP1Setup(){
     // draw player 1 setup screen
     const char* p1text = "Player 1, place a ship";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
-    player1.drawSetupBoard();
-    
     // should update state after the player puts a ship on board.
+    if(player1.drawSetupBoard()){
+        state = GameState::P2Transition;
+    }
+}
+
+void Game::drawP2Transition(){
+    const char* p2text = "Player 2 Ready";
+    DrawText(p2text, GetScreenWidth() / 2 - MeasureText(p2text, 30) / 2, 10, 30, BLACK);
 }
 
 //private helper functions.
-
 void Game::updateGameState(GameState newState){
     state = newState;
 }

@@ -10,13 +10,14 @@ using namespace std;
 class Player{
     public:
         Player(int shipCount);
-        void drawSetupBoard();
-        void drawShipsonBoard();
+        bool drawSetupBoard(); // returns true when all ships are placed and ready button is clicked, else false.
         
         
     private:
         Board playerBoard;
         vector<Ship> ships;
         //string name;
+
+        void drawShipsonBoard(); 
 
 };

@@ -31,8 +31,7 @@ class Game{
         int NoOfShips;
 
         int getSelectedOption(vector<Rectangle>& options);
-        void updateGameState(GameState newState);
-
+        void updateGameState(GameState newState); // not used and not nessecary
 
         
 

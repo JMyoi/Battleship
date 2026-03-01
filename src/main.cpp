@@ -16,7 +16,6 @@ int main(void)
     while (!WindowShouldClose())
     {
         //1, Event handling and update
-
         //2. Draw
         BeginDrawing();
             ClearBackground(RAYWHITE);
@@ -27,6 +26,9 @@ int main(void)
                     break;
                 case GameState::SetupP1:
                     game.drawP1Setup();
+                    break;
+                case GameState::P2Transition:
+                    game.drawP2Transition();
                     break;
             }
 

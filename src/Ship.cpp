@@ -1,6 +1,7 @@
 #include "Ship.hpp"
 #include <vector>
 #include <iostream>
+#include <string>
 using namespace std;
 
 
@@ -23,10 +24,30 @@ void Ship::drawShip(Vector2 newPos){
     // make ship rectangle vertical, in case it was horizontal and switches back 
     int height = 50*size;
     shipRect = {newPos.x, newPos.y, 50, float(height)};
-    // shipRect.x = newPos.x;
-    // shipRect.y = newPos.y;
     direction = Direction::Vertical;
-    DrawRectangleRec(shipRect, GRAY);
+    switch (size)
+    {
+    case 1:
+        DrawRectangleRec(shipRect, GRAY);
+
+        break;
+    case 2:
+        DrawRectangleRec(shipRect, DARKGRAY);
+        break;
+
+    case 3:
+        DrawRectangleRec(shipRect, BROWN);
+        break;
+    case 4:
+        DrawRectangleRec(shipRect, DARKBROWN);
+        break;
+    case 5:
+        DrawRectangleRec(shipRect, BEIGE);
+        break;
+
+    }
+    DrawText(to_string(size).c_str(), newPos.x, newPos.y, 20, BLACK);
+
 }
 
 void Ship::drawShipHorizontal(Vector2 newPos){
@@ -34,10 +55,28 @@ void Ship::drawShipHorizontal(Vector2 newPos){
     int width = 50*size;
     shipRect = {newPos.x, newPos.y, float(width), 50};
     direction = Direction::Horizontal;
-    // shipRect.x = newPos.x;
-    // shipRect.y = newPos.y;
-    DrawRectangleRec(shipRect, GRAY);
+    switch (size)
+    {
+    case 1:
+        DrawRectangleRec(shipRect, GRAY);
 
+        break;
+    case 2:
+        DrawRectangleRec(shipRect, DARKGRAY);
+        break;
+
+    case 3:
+        DrawRectangleRec(shipRect, BROWN);
+        break;
+    case 4:
+        DrawRectangleRec(shipRect, DARKBROWN);
+        break;
+    case 5:
+        DrawRectangleRec(shipRect, BEIGE);
+        break;
+
+    }
+    DrawText(to_string(size).c_str(), newPos.x, newPos.y, 20, BLACK);
 }
 
 bool Ship::shipClicked(){
@@ -68,6 +107,28 @@ bool Ship::isPlaced(){
 
 void Ship::draw(){
     // draw the ship that has a position set from placement. 
-    DrawRectangleRec(shipRect, GRAY);
+    switch (size)
+    {
+    case 1:
+        DrawRectangleRec(shipRect, GRAY);
+
+        break;
+    case 2:
+        DrawRectangleRec(shipRect, DARKGRAY);
+        break;
+
+    case 3:
+        DrawRectangleRec(shipRect, BROWN);
+        break;
+    case 4:
+        DrawRectangleRec(shipRect, DARKBROWN);
+        break;
+    case 5:
+        DrawRectangleRec(shipRect, BEIGE);
+        break;
+
+    }
+    DrawText(to_string(size).c_str(), shipRect.x, shipRect.y, 20, BLACK);
+
 }
 
