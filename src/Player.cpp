@@ -95,7 +95,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
         if(result == ShotResult::Hit){
             cout<<"You've hit the ship at: "<<pos.row<<", "<<pos.col<<endl;
             // register the hit on the respective ship segment
-            for(Ship ship: ships){
+            for(Ship& ship: ships){
                 if(ship.matchingAt(pos)){
                     ship.shipHitAt(pos);
                 }
@@ -117,6 +117,16 @@ bool Player::drawTrackingBoard(ShotResult& res){
     }
     return false;
     
+}
+bool Player::checkGameOver(){
+    //check if all ships are sunk
+    bool allSunk = true;// assume true first
+    for(Ship& ship: ships){
+        if(!ship.isSunk()){
+            return allSunk = false;
+        }
+    }
+    return allSunk;
 }
 
 //helper funcitons.

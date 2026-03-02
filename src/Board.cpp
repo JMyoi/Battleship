@@ -15,6 +15,20 @@ Tile::Tile(){
 void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
     // based on the state, display different color, red for hit, blue for miss, nothing for miss.
+    int centerX = rect.x + 25; // height and width is default 50, 50/2 = 25.
+    int centerY = rect.y + 25;
+    switch (state)
+    {
+    case TileState::Hit:
+       DrawCircle(centerX, centerY, 10, RED);
+        break;
+    case TileState::Miss:
+       DrawCircle(centerX, centerY, 10, BLUE);
+        break;
+    case TileState::Empty:
+    case TileState::Ship:
+        break;
+    }
 }
 bool Tile::isClicked(){
     if(CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))

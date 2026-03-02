@@ -3,6 +3,7 @@
 #include "raylib.h"
 #include <vector>
 #include <string>
+#include <iostream>
 using namespace std;
 
 // global variable for main menu Number of ship selection, -1 means no option selected
@@ -102,7 +103,7 @@ void Game::drawP1Transition(){
         DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
         break;
     case ShotResult::Miss:
-        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, GREEN);
+        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
         break;
     case ShotResult::AlreadyFired:
         //do nothing
@@ -114,9 +115,14 @@ void Game::drawP1Transition(){
     Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
-    //handle ready click and change state to set up player 2.
+    //handle ready click and change state to player 1 Turn or game over .
     if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        state = GameState::TurnP1;
+        if(player1.checkGameOver()){
+            state = GameState::GameOver;
+        }
+        else{
+            state = GameState::TurnP1;
+        }
     }
 }
 
@@ -127,7 +133,7 @@ void Game::drawP2Transition(){
         DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
         break;
     case ShotResult::Miss:
-        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, GREEN);
+        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
         break;
     case ShotResult::AlreadyFired:
         //do nothing
@@ -139,9 +145,14 @@ void Game::drawP2Transition(){
     Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
-    //handle ready click and change state to set up player 2.
+    //handle ready click and change state to set up player 2 Turn or game over.
     if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        state = GameState::TurnP2;
+        if(player2.checkGameOver()){
+            state = GameState::GameOver;
+        }
+        else{
+            state = GameState::TurnP2;
+        }
     }
 }
 
@@ -173,9 +184,18 @@ void Game::drawP2Turn(){
     }
 }
 
+
+
 void Game::drawGameOver(){
     const char* text = "GameOver";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    //display who wins
+    if(player1.checkGameOver()){
+        DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
+    }
+    else{
+        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
+    }
 }
 
 

@@ -122,6 +122,14 @@ void Ship::shipHitAt(position pos){
         }
     }
 }
+bool Ship::isSunk(){
+    bool sunk = true;// assume true first and if any are not hit then we set to false.
+    for(position& pos: positions){
+        if(pos.hit == false)
+            return sunk = false;
+    }
+    return sunk;
+}
 
 void Ship::draw(){
     // draw the ship that has a position set from placement. 

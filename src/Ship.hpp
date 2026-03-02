@@ -24,6 +24,7 @@ class Ship{
         bool isPlaced();
         void shipHitAt(position pos);
         bool matchingAt(position pos); // returns true if there are any ship unit positions that match the given arguments position.
+        bool isSunk();
 
     private:
         int size;
