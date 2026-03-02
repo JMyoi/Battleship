@@ -105,6 +105,24 @@ bool Ship::isPlaced(){
     return false;
 }
 
+// returns true if there are any ship unit positions that match the given arguments position.
+bool Ship::matchingAt(position pos){
+    for(int i = 0; i<positions.size(); i++){
+        if(positions.at(i).row == pos.row && positions.at(i).col == pos.col){
+            return true;
+        }
+    }
+    return false;
+}
+//should register a hit at the position and set the hit to true;
+void Ship::shipHitAt(position pos){
+    for(int i = 0; i<positions.size(); i++){
+        if(positions.at(i).row == pos.row && positions.at(i).col == pos.col){
+            positions.at(i).hit = true;
+        }
+    }
+}
+
 void Ship::draw(){
     // draw the ship that has a position set from placement. 
     switch (size)

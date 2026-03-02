@@ -1,4 +1,5 @@
 #include "Game.hpp"
+#include "Board.hpp"
 #include "raylib.h"
 #include <vector>
 #include <string>
@@ -8,7 +9,7 @@ using namespace std;
 int selectedOption = -1; 
 
 //constructor
-Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(-1) {}
+Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
 
 GameState Game::getGameState(){
     return state;
@@ -95,8 +96,20 @@ void Game::drawP2Setup(){
 }
 
 void Game::drawP1Transition(){
+    // result from players shot, 
+    switch (CurrResult){
+    case ShotResult::Hit:
+        DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
+        break;
+    case ShotResult::Miss:
+        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, GREEN);
+        break;
+    case ShotResult::AlreadyFired:
+        //do nothing
+        break;   
+     }
     const char* text = "Player 1 Ready?";
-    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 300, 30, BLACK);
     // Ready Button
     Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
@@ -108,8 +121,20 @@ void Game::drawP1Transition(){
 }
 
 void Game::drawP2Transition(){
-    const char* text = "Player 1 Ready?";
-    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    // result from players shot, 
+    switch (CurrResult){
+    case ShotResult::Hit:
+        DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
+        break;
+    case ShotResult::Miss:
+        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, GREEN);
+        break;
+    case ShotResult::AlreadyFired:
+        //do nothing
+        break;   
+     }
+    const char* text = "Player 2 Ready?";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 300, 30, BLACK);
      // Ready Button
     Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
@@ -127,14 +152,25 @@ void Game::drawP1Turn(){
     player1.drawBoard();
     // render tracking board with info about other players board.
     // handle click on tracking board in this trakcing board funciton.
-    player2.drawTrackingBoard();
-    // displays hit or miss in the next players transition screen
+    ShotResult result;
+    if(player2.drawTrackingBoard(result)){ // should return true if hit or miss was registered.
+        // displays hit or miss in the next players transition screen
+        CurrResult = result;
+        state = GameState::P2Transition;
+    }
 
 }
 
 void Game::drawP2Turn(){
-    const char* text = "Player 1 Turn";
+    const char* text = "Player 2 Turn";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    player2.drawBoard();
+    ShotResult result;
+    if(player1.drawTrackingBoard(result)){ // should return true if hit or miss was registered.
+        // displays hit or miss in the next players transition screen
+        CurrResult = result;
+        state = GameState::P1Transition;
+    }
 }
 
 void Game::drawGameOver(){

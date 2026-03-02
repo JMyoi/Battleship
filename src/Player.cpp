@@ -84,23 +84,38 @@ void Player::drawBoard(){
     drawShipsonBoard();
 }
 
-void Player::drawTrackingBoard(){
+//should return true if hit or miss is registered and update the result argument so that the game can change it's state and have information if the player hit or miss.
+bool Player::drawTrackingBoard(ShotResult& res){
     Vector2 start = {600, 50};
     playerBoard.Draw(start);
     //handle click on tile.
     ShotResult result; // result will be put here, hit, miss, alreadyFired
-    position at; // position at the fire attempt will be stored here, row, col, hit.
-    if(playerBoard.HandleFire(result, at)){
+    position pos; // position at the fire attempt will be stored here, row, col, hit.
+    if(playerBoard.HandleFire(result, pos)){
         if(result == ShotResult::Hit){
-            cout<<"You've hit the ship at: "<<at.row<<", "<<at.col<<endl;
+            cout<<"You've hit the ship at: "<<pos.row<<", "<<pos.col<<endl;
+            // register the hit on the respective ship segment
+            for(Ship ship: ships){
+                if(ship.matchingAt(pos)){
+                    ship.shipHitAt(pos);
+                }
+            }
+            //change state to next player transition screen
+            res = result; // res = Hit
+            return true;
         }
         else if(result == ShotResult::Miss){
-            cout<<"You've Missed at: "<<at.row<<", "<<at.col<<endl;
+            cout<<"You've Missed at: "<<pos.row<<", "<<pos.col<<endl;
+            //change state to next player transition screen.
+            res = result; // result is miss
+            return true;
         } 
         else if(result == ShotResult::AlreadyFired){
-            cout<<"You've Already Fired at: "<<at.row<<", "<<at.col<<endl;
+            cout<<"You've Already Fired at: "<<pos.row<<", "<<pos.col<<endl;
+            return false;
         }
     }
+    return false;
     
 }
 

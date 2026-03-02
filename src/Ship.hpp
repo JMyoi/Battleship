@@ -17,17 +17,16 @@ class Ship{
     public:
         Ship(int size);
         void setShip(const vector<position>& newPositions);// if a ship is placed on the board this is called to set the ships position and direction.
-        void drawShip(Vector2 newPos);
+        void drawShip(Vector2 newPos);// vertical by default
         void drawShipHorizontal(Vector2 newPos);
         void draw(); // draw the ship that has a position set from placement. 
         bool shipClicked();
         bool isPlaced();
-        bool shipHitAt(position pos); // should return true if all ships are sunk and so the state will change to gameOver
-
+        void shipHitAt(position pos);
+        bool matchingAt(position pos); // returns true if there are any ship unit positions that match the given arguments position.
 
     private:
         int size;
-        //vector<bool> hitMask; // going from right to left or top down
         vector<position> positions;
         Rectangle shipRect; // for drawing the ship, will be set to the appropriate position and size when the ship is placed
         Direction direction; 
