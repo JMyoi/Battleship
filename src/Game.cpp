@@ -97,25 +97,48 @@ void Game::drawP2Setup(){
 void Game::drawP1Transition(){
     const char* text = "Player 1 Ready?";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    // Ready Button
+    Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
+    DrawRectangleRec(ReadyButton, LIGHTGRAY);
+    DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
+    //handle ready click and change state to set up player 2.
+    if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+        state = GameState::TurnP1;
+    }
 }
 
 void Game::drawP2Transition(){
     const char* text = "Player 1 Ready?";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+     // Ready Button
+    Rectangle ReadyButton = {(float)((GetScreenWidth() / 2) - 50), 410, 100, 50};
+    DrawRectangleRec(ReadyButton, LIGHTGRAY);
+    DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
+    //handle ready click and change state to set up player 2.
+    if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+        state = GameState::TurnP2;
+    }
 }
 
 void Game::drawP1Turn(){
-     const char* text = "Player 1 Turn";
+    const char* text = "Player 1 Turn";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    // render the players board and it's ships, along with hits, misses, sunken ships.
+    player1.drawBoard();
+    // render tracking board with info about other players board.
+    // handle click on tracking board in this trakcing board funciton.
+    player2.drawTrackingBoard();
+    // displays hit or miss in the next players transition screen
+
 }
 
 void Game::drawP2Turn(){
-     const char* text = "Player 1 Turn";
+    const char* text = "Player 1 Turn";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
 }
 
 void Game::drawGameOver(){
-     const char* text = "GameOver";
+    const char* text = "GameOver";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
 }
 

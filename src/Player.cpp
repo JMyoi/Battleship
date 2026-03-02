@@ -1,5 +1,6 @@
 #include "Player.hpp"
 #include "Ship.hpp"
+#include "Board.hpp"
 #include <iostream>
 
 using namespace std;
@@ -75,6 +76,32 @@ bool Player::drawSetupBoard(){
         return allPlaced;
     }
     return false;
+}
+
+void Player::drawBoard(){
+    Vector2 start = {50, 50};
+    playerBoard.Draw(start);
+    drawShipsonBoard();
+}
+
+void Player::drawTrackingBoard(){
+    Vector2 start = {600, 50};
+    playerBoard.Draw(start);
+    //handle click on tile.
+    ShotResult result; // result will be put here, hit, miss, alreadyFired
+    position at; // position at the fire attempt will be stored here, row, col, hit.
+    if(playerBoard.HandleFire(result, at)){
+        if(result == ShotResult::Hit){
+            cout<<"You've hit the ship at: "<<at.row<<", "<<at.col<<endl;
+        }
+        else if(result == ShotResult::Miss){
+            cout<<"You've Missed at: "<<at.row<<", "<<at.col<<endl;
+        } 
+        else if(result == ShotResult::AlreadyFired){
+            cout<<"You've Already Fired at: "<<at.row<<", "<<at.col<<endl;
+        }
+    }
+    
 }
 
 //helper funcitons.

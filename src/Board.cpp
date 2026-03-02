@@ -14,6 +14,7 @@ Tile::Tile(){
 
 void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
+    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
 }
 bool Tile::isClicked(){
     if(CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
@@ -57,6 +58,55 @@ void Board::Draw(Vector2 start){
         TileY += TileHeight;  // Move to next row
     }
 
+}
+
+/* Trackingboard funciton calls this funciton,
+should return true only if a tile is clicked
+false otherwise
+should check for clicks on the board and update result parameter accordingly
+    if tileSate == Empty, return Miss
+    if TileState == Ship, return Hit
+    if TileState == Hit, return AlreadyFired
+    if TileState == Miss, return AlreadyFired
+should return the tile it has fired at if hit so players ship vector can update it's state.
+*/ 
+bool Board::HandleFire(ShotResult& result, position& at){
+    for(int row = 0; row<10; row++){
+        for(int col = 0; col<10; col++){
+            if(grid.at(row).at(col).isClicked()){
+                TileState thisTileState = grid.at(row).at(col).state;
+                switch (thisTileState)
+                {
+                case TileState::Empty:
+                    grid.at(row).at(col).state = TileState::Miss;// update tile state on board to hit.
+                    result = ShotResult::Miss;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = false;
+                    return true;
+                    break;
+                case TileState::Ship:
+                    grid.at(row).at(col).state = TileState::Hit;// update tile state on board to hit.
+                    result = ShotResult::Hit;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = true;
+                    return true;
+                    break;
+                case TileState::Hit:
+                case TileState::Miss:
+                    result = ShotResult::AlreadyFired;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = true;
+                    return true;
+                    break;
+                }
+
+            }
+        }
+    }
+    return false;
 }
 
 //returns the positions where it was placed.

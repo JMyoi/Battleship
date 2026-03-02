@@ -22,6 +22,7 @@ class Ship{
         void draw(); // draw the ship that has a position set from placement. 
         bool shipClicked();
         bool isPlaced();
+        bool shipHitAt(position pos); // should return true if all ships are sunk and so the state will change to gameOver
 
 
     private:
