@@ -15,7 +15,6 @@ GameState Game::getGameState(){
 }
 
 void Game::drawMenu() {
-
     Vector2 mousePos = GetMousePosition();
     int centerX = GetScreenWidth() / 2;
 
@@ -65,18 +64,62 @@ void Game::drawMenu() {
 
 void Game::drawP1Setup(){
     // draw player 1 setup screen
-    const char* p1text = "Player 1, place a ship";
+    const char* p1text = "Player 1, place your ships";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     // should update state after the player puts a ship on board.
     if(player1.drawSetupBoard()){
-        state = GameState::P2Transition;
+        state = GameState::P2SetupTransition;
     }
 }
 
-void Game::drawP2Transition(){
-    const char* p2text = "Player 2 Ready";
+void Game::drawP2SetupTransition(){
+    const char* p2text = "Player 2 Ready for setup?";
     DrawText(p2text, GetScreenWidth() / 2 - MeasureText(p2text, 30) / 2, 10, 30, BLACK);
+    //button to click ready.
+    int centerX = GetScreenWidth() / 2;
+    Rectangle ReadyButton = {(float)(centerX - 50), 410, 100, 50};
+    DrawRectangleRec(ReadyButton, LIGHTGRAY);
+    DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
+    //handle ready click and change state to set up player 2.
+    if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
+        state = GameState::SetupP2;
+    }
 }
+
+void Game::drawP2Setup(){
+    const char* p2text = "Player 2, place your ships";
+    DrawText(p2text, GetScreenWidth() / 2 - MeasureText(p2text, 30) / 2, 10, 30, BLACK);
+    if(player2.drawSetupBoard()){
+        state = GameState::P1Transition;
+    }
+}
+
+void Game::drawP1Transition(){
+    const char* text = "Player 1 Ready?";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+}
+
+void Game::drawP2Transition(){
+    const char* text = "Player 1 Ready?";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+}
+
+void Game::drawP1Turn(){
+     const char* text = "Player 1 Turn";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+}
+
+void Game::drawP2Turn(){
+     const char* text = "Player 1 Turn";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+}
+
+void Game::drawGameOver(){
+     const char* text = "GameOver";
+    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+}
+
+
 
 //private helper functions.
 void Game::updateGameState(GameState newState){

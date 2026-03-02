@@ -63,7 +63,6 @@ bool Player::drawSetupBoard(){
     Rectangle startButton = {(float)(centerX - 50), 675, 100, 50};
     DrawRectangleRec(startButton, LIGHTGRAY);
     DrawText("Ready", startButton.x + 20, startButton.y + 15, 20, BLACK);
-
     //handle ready click, should only return true if all ships are placed on board.
     if(CheckCollisionPointRec(GetMousePosition(), startButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
         bool allPlaced = true;

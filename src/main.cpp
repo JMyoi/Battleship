@@ -21,14 +21,33 @@ int main(void)
             ClearBackground(RAYWHITE);
 
             switch(GameState state = game.getGameState()){
+
                 case GameState::Menu:
                     game.drawMenu();
                     break;
                 case GameState::SetupP1:
                     game.drawP1Setup();
                     break;
+                case GameState::P2SetupTransition:
+                    game.drawP2SetupTransition();
+                    break;
+                case GameState::SetupP2:
+                    game.drawP2Setup();
+                    break;
+                case GameState::P1Transition:
+                    game.drawP1Transition();
+                    break;
                 case GameState::P2Transition:
                     game.drawP2Transition();
+                    break;
+                case GameState::TurnP1:
+                    game.drawP1Turn();
+                    break;
+                case GameState::TurnP2:
+                    game.drawP2Turn();
+                    break;
+                case GameState::GameOver:
+                    game.drawGameOver();
                     break;
             }
 

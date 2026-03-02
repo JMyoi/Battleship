@@ -5,11 +5,10 @@ using namespace std;
 
 
 enum class GameState { Menu, 
-    SetupP1, SetupP2,
+    SetupP1, P2SetupTransition, SetupP2,
     P1Transition, P2Transition,
     TurnP1, TurnP2, 
     GameOver };
-
 
 class Game{
     public:
@@ -17,6 +16,7 @@ class Game{
         GameState getGameState();
         void drawMenu();
         void drawP1Setup();
+        void drawP2SetupTransition();
         void drawP2Setup();
         void drawP1Transition();
         void drawP2Transition();
