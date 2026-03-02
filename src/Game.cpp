@@ -159,6 +159,10 @@ void Game::drawP2Transition(){
 void Game::drawP1Turn(){
     const char* text = "Player 1 Turn";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    const char* Myboard = "My Board";
+    DrawText(Myboard,(GetScreenWidth()/4 - MeasureText(Myboard,25)/2), 70,  25, BLACK);
+    const char* TargetBoard = "Target Board";
+    DrawText(TargetBoard,((GetScreenWidth()/4)*3 - MeasureText(TargetBoard,25)/2), 70,  25, BLACK);
     // render the players board and it's ships, along with hits, misses, sunken ships.
     player1.drawBoard();
     // render tracking board with info about other players board.
@@ -169,12 +173,15 @@ void Game::drawP1Turn(){
         CurrResult = result;
         state = GameState::P2Transition;
     }
-
 }
 
 void Game::drawP2Turn(){
     const char* text = "Player 2 Turn";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    const char* Myboard = "My Board";
+    DrawText("MyBoard",(GetScreenWidth()/4 - MeasureText(Myboard,25)/2), 70,  25, BLACK);
+    const char* TargetBoard = "Target Board";
+    DrawText(TargetBoard,((GetScreenWidth()/4)*3 - MeasureText(TargetBoard,25)/2), 70,  25, BLACK);
     player2.drawBoard();
     ShotResult result;
     if(player1.drawTrackingBoard(result)){ // should return true if hit or miss was registered.

@@ -91,7 +91,7 @@ void Ship::setShip(const vector<position>& newPositions){
     positions = newPositions;
     //update x and y of rectangle based on where the first position is.
     float newX = 50 + newPositions.at(0).col * 50;
-    float newY = 50 + newPositions.at(0).row * 50;
+    float newY = 100 + newPositions.at(0).row * 50;
     shipRect.x = newX;
     shipRect.y = newY;
     cout<<"the ships position is now: "<<shipRect.x<<", "<<shipRect.y<<endl;

@@ -2,6 +2,7 @@
 #include "Ship.hpp"
 #include "Board.hpp"
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -16,15 +17,16 @@ Player::Player(int shipCount){
 
 int selectedShip = -1; // global varuable for setup, holds what ship is clicked on to be placed on the board.
 Direction direction = Direction::Vertical;
+string ErrorMessage = "";// might need to be placed as a global variable because every frame this is reassigned to empty
 // draws the players setup board, logic for handling ship placement and ship displaying on board and out of board for seleciton and placement.
 bool Player::drawSetupBoard(){
     // draw the player's board and the ships on the board if there are any placed before.
-    Vector2 start = {50, 50};
+    Vector2 start = {50, 100};
     playerBoard.Draw(start);
     drawShipsonBoard();
 
     //draw rectangular ships on the side that can be dragged and dropped onto the board
-    Vector2 shipStart = {600, 50};
+    Vector2 shipStart = {600, 100};
     for(int i = 0; i < ships.size(); i++){
         if(ships.at(i).shipClicked() || selectedShip == i){ // if a ship is clicked then it should not be displayed but it should follow the cursor.
             selectedShip = i;
@@ -38,25 +40,33 @@ bool Player::drawSetupBoard(){
     }
     // handle click and drag of ships ship placement on board detection.
     if(selectedShip>=0){
-        //TODO: Logic for Rotating ship with R and displaying the right orientation, based on direction.
+        //Logic for Rotating ship with R and displaying the right orientation, based on direction.
         if(IsKeyPressed(KEY_R)){
             direction = (direction == Direction::Vertical) ? Direction::Horizontal : Direction::Vertical ;
             cout<<"Direction Changed "<<endl;
         }
         if(direction == Direction::Vertical){
-            ships.at(selectedShip).drawShip(GetMousePosition());
+            ships.at(selectedShip).drawShip({GetMousePosition().x - 25, GetMousePosition().y - 25});
         }
         else if(direction == Direction::Horizontal){
-            ships.at(selectedShip).drawShipHorizontal(GetMousePosition());
+            ships.at(selectedShip).drawShipHorizontal({GetMousePosition().x - 25, GetMousePosition().y - 25});
         }
-        
         vector<position> newPositions(selectedShip+1);
-        if(playerBoard.HandlePlaceShip(selectedShip+1, newPositions, direction)){// should pass in Direction as another parameter
+        if(playerBoard.HandlePlaceShip(selectedShip+1, newPositions, direction, ErrorMessage)){// should pass in Direction as another parameter
             // update the players respective ships position if the placement on board was successfull..
             ships.at(selectedShip).setShip(newPositions);
             selectedShip = -1; // deselect after successful placement
+            ErrorMessage = "";
+        }
+        else{
+            //error message from attempted placement
+            DrawText(ErrorMessage.c_str(), (GetScreenWidth()/2 + 50), 600, 15, RED);
         }
     }
+
+    //Display r to rotate text
+    char RotateText[] = "Press R to Rotate";
+    DrawText(RotateText, (GetScreenWidth()/2 + 50), 500, 25, BLACK);
 
     //display ready button
     int centerX = GetScreenWidth()/2;
@@ -79,15 +89,32 @@ bool Player::drawSetupBoard(){
 }
 
 void Player::drawBoard(){
-    Vector2 start = {50, 50};
+    Vector2 start = {50, 100};
     playerBoard.Draw(start);
     drawShipsonBoard();
+    //draw how much Ships are sunk
+    int sunkCount = 0;
+    for(Ship& ship: ships){
+        if(ship.isSunk())
+            sunkCount++;
+    }
+    string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
+    DrawText(sunkText.c_str(), (GetScreenWidth()/4 - MeasureText(sunkText.c_str(),25)/2), 620, 25, BLACK);
+
 }
 
 //should return true if hit or miss is registered and update the result argument so that the game can change it's state and have information if the player hit or miss.
 bool Player::drawTrackingBoard(ShotResult& res){
-    Vector2 start = {600, 50};
+    Vector2 start = {600, 100};
     playerBoard.Draw(start);
+    //draw how much ships are sunk
+    int sunkCount = 0;
+    for(Ship& ship: ships){
+        if(ship.isSunk())
+            sunkCount++;
+    }
+    string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
+    DrawText(sunkText.c_str(), ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2), 620, 25, BLACK);
     //handle click on tile.
     ShotResult result; // result will be put here, hit, miss, alreadyFired
     position pos; // position at the fire attempt will be stored here, row, col, hit.

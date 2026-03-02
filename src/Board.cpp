@@ -124,7 +124,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
 }
 
 //returns the positions where it was placed.
-bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction){
+bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage){
     for(int row = 0; row<10; row++){
         for(int col = 0; col<10; col++){
 
@@ -146,6 +146,7 @@ bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direct
                                 }
                             else{
                                 cout<<"ship cannot be placed, either out of bound or ship already there.\n";
+                                ErrorMessage = "Cannot place, either out of bound or ship already there";
                                 return canPlace = false; 
                             }
                         }
@@ -163,11 +164,10 @@ bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direct
                             return true;
                         }
                         // detect if ship trying to be placed is colliding with other ships that are already placed.
-                        //edgecase? shipsize is one.
                     }
                     else if(direction == Direction::Horizontal){
                          for(int i = 0; i<shipSize-1; i++){
-                            // to access the vertical directions index, we do curCol+1, for shipSize-1 times.
+                            // to access the horizontal directions index, we do curCol+1, for shipSize-1 times.
                             currCol++; 
                             bool outOfBound = currCol>=10;
                             // check for not out of bound and tile is empty.
@@ -176,6 +176,8 @@ bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direct
                                 }
                             else{
                                 cout<<"ship cannot be placed, either out of bound or ship already there.\n";
+                                ErrorMessage = "Cannot place, either out of bound or ship already there";
+
                                 return canPlace = false; 
                             }
                         }
@@ -197,6 +199,7 @@ bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direct
 
                 }else{
                     cout<<"ship cannot be placed ship already there.\n";
+                    ErrorMessage = "Cannot place, ship already there.";
                     return false;
                 }
             }

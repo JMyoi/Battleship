@@ -19,7 +19,6 @@ class Player{
     private:
         Board playerBoard;
         vector<Ship> ships;
-        //string name;
 
         void drawShipsonBoard(); 
 

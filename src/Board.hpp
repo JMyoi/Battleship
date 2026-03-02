@@ -22,7 +22,7 @@ class Board{
     public:
         Board();
         void Draw(Vector2 start); 
-        bool HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction); // returns true if the ship is placed and false if not.
+        bool HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction,string& ErrorMessage); // returns true if the ship is placed and false if not.
         bool HandleFire(ShotResult& result, position& at); // checks for a click on board and tries to verify hit or miss.
     private:
         vector<vector<Tile>> grid; // 2D grid of tiles
