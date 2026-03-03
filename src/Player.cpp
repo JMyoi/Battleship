@@ -100,8 +100,8 @@ void Player::drawBoard(){
     }
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
-float bottomOfGrid = start.y + 10 * TileHeight;
-DrawText(sunkText.c_str(),
+    float bottomOfGrid = start.y + 10 * TileHeight;
+    DrawText(sunkText.c_str(),
          (GetScreenWidth()/4 - MeasureText(sunkText.c_str(),25)/2),
          (int)(bottomOfGrid + 45),   // under the letter
          25, BLACK);
@@ -120,8 +120,8 @@ bool Player::drawTrackingBoard(ShotResult& res){
     }
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
-float bottomOfGrid = start.y + 10 * TileHeight;
-DrawText(sunkText.c_str(),
+    float bottomOfGrid = start.y + 10 * TileHeight;
+    DrawText(sunkText.c_str(),
          ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2),
          (int)(bottomOfGrid + 45),
          25, BLACK);

@@ -46,7 +46,6 @@ Board::Board(){
     for(int i = 0; i < 10; i++){
         grid.at(i).resize(10);
     }
-
 }
 
 

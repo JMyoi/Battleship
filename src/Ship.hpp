@@ -29,8 +29,11 @@ class Ship{
     private:
         int size;
         vector<position> positions;
-        Rectangle shipRect; // for drawing the ship, will be set to the appropriate position and size when the ship is placed
+        Rectangle shipRect; // registering ship hits on click, will be set to the appropriate position and size when the ship is placed
         Direction direction; 
+        //ship texture and image based on size
+        Texture2D sprite;
+
 
 
 };
