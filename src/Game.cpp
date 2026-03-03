@@ -116,14 +116,16 @@ void Game::drawP1Transition(){
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to player 1 Turn or game over .
-    if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        if(player1.checkGameOver()){
-            state = GameState::GameOver;
-        }
-        else{
-            state = GameState::TurnP1;
-        }
+    if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+    if (player1.checkGameOver()) {   // Player 2 has no remaining ships.
+                                    // Record Player 1 as the winner and transition to GameOver.
+        winner = 2;
+        state = GameState::GameOver;
+    } else {
+        state = GameState::TurnP1;
     }
+}
+    
 }
 
 void Game::drawP2Transition(){
@@ -146,14 +148,17 @@ void Game::drawP2Transition(){
     DrawRectangleRec(ReadyButton, LIGHTGRAY);
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to set up player 2 Turn or game over.
-    if(CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        if(player2.checkGameOver()){
-            state = GameState::GameOver;
-        }
-        else{
-            state = GameState::TurnP2;
-        }
+    if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+    if (player2.checkGameOver()) {   // Player 1 has no remaining ships.
+                                    // Record Player 2 as the winner and transition to GameOver.
+winner = 2;
+state = GameState::GameOver;
+        winner = 1;
+        state = GameState::GameOver;
+    } else {
+        state = GameState::TurnP2;
     }
+}
 }
 
 void Game::drawP1Turn(){
@@ -168,11 +173,19 @@ void Game::drawP1Turn(){
     // render tracking board with info about other players board.
     // handle click on tracking board in this trakcing board funciton.
     ShotResult result;
-    if(player2.drawTrackingBoard(result)){ // should return true if hit or miss was registered.
-        // displays hit or miss in the next players transition screen
-        CurrResult = result;
+    if (player2.drawTrackingBoard(result)) {
+    CurrResult = result;
+
+    // Immediately check if Player 2 has lost after Player 1 fires.
+// If all of Player 2's ships are sunk, transition directly to GameOver
+// instead of going through the Player 2 Ready transition screen.
+    if (player2.checkGameOver()) {
+        winner = 1;
+        state = GameState::GameOver;
+    } else {
         state = GameState::P2Transition;
     }
+}
 }
 
 void Game::drawP2Turn(){
@@ -184,11 +197,19 @@ void Game::drawP2Turn(){
     DrawText(TargetBoard,((GetScreenWidth()/4)*3 - MeasureText(TargetBoard,25)/2), 70,  25, BLACK);
     player2.drawBoard();
     ShotResult result;
-    if(player1.drawTrackingBoard(result)){ // should return true if hit or miss was registered.
-        // displays hit or miss in the next players transition screen
-        CurrResult = result;
+    if (player1.drawTrackingBoard(result)) {
+    CurrResult = result;
+
+    // Immediately check if Player 1 has lost after Player 2 fires.
+// If all of Player 1's ships are sunk, transition directly to GameOver
+// to prevent unnecessary transition screens.
+    if (player1.checkGameOver()) {
+        winner = 2;
+        state = GameState::GameOver;
+    } else {
         state = GameState::P1Transition;
     }
+}
 }
 
 
@@ -196,12 +217,13 @@ void Game::drawP2Turn(){
 void Game::drawGameOver(){
     const char* text = "GameOver";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
-    //display who wins
-    if(player1.checkGameOver()){
+
+    if (winner == 1) {
         DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
-    }
-    else{
-        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
+    } else if (winner == 2) {
+        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 2 Wins", 30) / 2, 100, 30, BLACK);
+    } else {
+        DrawText("No winner?", GetScreenWidth() / 2 - MeasureText("No winner?", 30) / 2, 100, 30, BLACK);
     }
 }
 

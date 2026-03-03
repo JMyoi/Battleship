@@ -25,6 +25,7 @@ class Game{
         void drawP1Turn();
         void drawP2Turn();
         void drawGameOver();
+        
 
     private:
         Player player1;
@@ -32,6 +33,13 @@ class Game{
         GameState state;
         int NoOfShips;
         ShotResult CurrResult;// keeps track and displays the players result after each fire, it's the first turn there will be no firing history and state will be AlreadyFired to indicate that, assigned by constructor
+        int winner = 0; 
+        // Stores the final winner of the match.
+        // 0 = no winner yet
+        // 1 = Player 1 wins
+        // 2 = Player 2 wins
+        // This value is set when the game transitions to GameOver.
+
 
         int getSelectedOption(vector<Rectangle>& options);
         void updateGameState(GameState newState); // not used and not nessecary
