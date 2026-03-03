@@ -92,6 +92,7 @@ void Player::drawBoard(){
     Vector2 start = {50, 100};
     playerBoard.Draw(start);
     drawShipsonBoard();
+    playerBoard.DrawHitsAndMiss(start);
     //draw how much Ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
@@ -111,6 +112,7 @@ void Player::drawBoard(){
 //should return true if hit or miss is registered and update the result argument so that the game can change it's state and have information if the player hit or miss.
 bool Player::drawTrackingBoard(ShotResult& res){
     Vector2 start = {600, 100};
+    playerBoard.DrawHitsAndMiss(start);
     playerBoard.Draw(start);
     //draw how much ships are sunk
     int sunkCount = 0;

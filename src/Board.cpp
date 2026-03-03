@@ -10,26 +10,48 @@ using namespace std;
 Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
+    // crop the top right corner from poof.png
+    Image img = LoadImage("src/assets/Poof.png");
+    //width 2000, height 1400
+    float h = static_cast<float>(img.height/3); 
+    float w = static_cast<float>(img.width/3); 
+    Rectangle crop = {0, 0, w, h};
+    ImageCrop(&img, crop);
+    crop = {300, 80, 170, 170};
+    ImageCrop(&img, crop);
+    ImageResize(&img,50,50);
+    impact = LoadTextureFromImage(img);    
 }
+
 
 void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
-    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
+}
+
+void Tile::drawHitsAndMiss(){
     int centerX = rect.x + 25; // height and width is default 50, 50/2 = 25.
     int centerY = rect.y + 25;
+    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
     switch (state)
     {
-    case TileState::Hit:
-       DrawCircle(centerX, centerY, 10, RED);
+    case TileState::Hit:{
+       //DrawCircle(centerX, centerY, 10, RED);
+       DrawTextureV(impact, {rect.x, rect.y}, WHITE);
         break;
-    case TileState::Miss:
-       DrawCircle(centerX, centerY, 10, BLUE);
-        break;
+    }
+    case TileState::Miss:{
+        DrawCircle(centerX, centerY, 10, BLUE);
+        //render the drip
+         break;
+    }
     case TileState::Empty:
     case TileState::Ship:
         break;
     }
+
 }
+
+
 bool Tile::isClicked(){
     if(CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         return true;
@@ -91,6 +113,15 @@ void Board::Draw(Vector2 start){
             
             }
             TileY += TileHeight;  // Move to next row
+        }
+
+}
+void Board::DrawHitsAndMiss(Vector2 start){
+    // assign all tiles appropriate width, height,  and position 
+        for(int row = 0; row<10; row++){
+            for(int col = 0; col<10; col++){
+                grid.at(row).at(col).drawHitsAndMiss();
+            }
         }
 
 }
