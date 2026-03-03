@@ -56,6 +56,29 @@ void Board::Draw(Vector2 start){
     float TileHeight = 50; // 50
     float TileX = start.x;  
     float TileY = start.y; 
+    int fontSize = 20;
+    float offsetTop = 30;
+    float offsetLeft = 30;
+
+
+// Column labels: A-J (bottom)
+for (int col = 0; col < 10; col++) {
+    char letter = 'A' + col;
+    DrawText(TextFormat("%c", letter),
+             (int)(start.x + col * TileWidth + 18),
+             (int)(start.y + 10 * TileHeight + 10), // below the grid
+             fontSize,
+             BLACK);
+}   
+// Row labels: 1-10
+for (int row = 0; row < 10; row++) {
+    DrawText(TextFormat("%d", row + 1),
+             (int)(start.x - offsetLeft),
+             (int)(start.y + row * TileHeight + TileHeight * 0.30f),
+             fontSize,
+             BLACK);
+}
+
 
     // assign all tiles appropriate width, height,  and position 
     for(int row = 0; row<10; row++){
