@@ -198,10 +198,10 @@ void Game::drawGameOver(){
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
     //display who wins
     if(player1.checkGameOver()){
-        DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
+        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 2 Wins", 30) / 2, 100, 30, BLACK);
     }
     else{
-        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
+        DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
     }
 }
 

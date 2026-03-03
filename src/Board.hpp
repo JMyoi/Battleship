@@ -1,6 +1,7 @@
 #pragma once
 #include "raylib.h"
 #include "Ship.hpp"
+#include <string>
 #include <vector>
 using namespace std;
 
