@@ -18,14 +18,14 @@ Tile::Tile(){
     float w = static_cast<float>(img.width/3); 
     Rectangle crop = {0, 0, w, h};
     ImageCrop(&img, crop);
-    crop = {300, 80, 170, 170};
+    crop = {300, 80, 170, 170}; // values deduced using tiral and error
     ImageCrop(&img, crop);
     ImageResize(&img,50,50);
     impact = LoadTextureFromImage(img);     
 
     //load the miss splash
     img = LoadImage("src/assets/drip.png");
-    crop = {570, 400,340,270};
+    crop = {570, 400,340,270}; // values deduced using tiral and error
     ImageCrop(&img, crop);
     ImageResize(&img,50,50);
     missSplash = LoadTextureFromImage(img);  
@@ -95,31 +95,64 @@ Board::Board(){
     Explosion = LoadTexture("src/assets/Explosion.png");
     explosionFrameCount = 7;
     explosionPosition = {0, 0};
-    explosionFrameRec = {0, 0, static_cast<float>(Explosion.width/explosionFrameCount)-12, static_cast<float>(Explosion.height)};
+    //offset 2 width 12 pixels tot he right because animation was leaking to the left
+    explosionFrameRec = {0, 0, static_cast<float>(Explosion.width/explosionFrameCount)-12, 
+    static_cast<float>(Explosion.height)};
     explosionCurrentFrame = 0;
     explosionFrameCounter = 0;
     explosionFramesSpeed = 8;
     explosionActive = false;
+
+    MissSplashAnimation = LoadTexture("src/assets/poofDrip.png");
+    SetTextureFilter(MissSplashAnimation, TEXTURE_FILTER_POINT);
+    missSplashFrameCount = 6;
+    missSplashFrames[0] = {0, 0, 200, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrames[1] = {200, 0, 340, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrames[2] = {500, 0, 340, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrames[3] = {850, 0, 340, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrames[4] = {1220, 0, 340, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrames[5] = {1600, 0, 400, static_cast<float>(MissSplashAnimation.height)};
+    missSplashFrameRec = missSplashFrames[0];
+    missSplashPosition = {0, 0};
+    missSplashCurrentFrame = 0;
+    missSplashFrameCounter = 0;
+    missSplashFramesSpeed = 12;
+    missSplashActive = false;
 }
 
 void Board::UpdateAnimations(){
-    if(!explosionActive){
-        return;
+    if(explosionActive){
+        explosionFrameCounter++;
+        if(explosionFrameCounter >= (60/explosionFramesSpeed)){
+            explosionFrameCounter = 0;
+            explosionCurrentFrame++;
+
+            if(explosionCurrentFrame >= explosionFrameCount){
+                explosionCurrentFrame = 0;
+                explosionFrameRec.x = 0;
+                explosionActive = false;
+            }
+            else{
+                explosionFrameRec.x = static_cast<float>(explosionCurrentFrame) * (static_cast<float>(Explosion.width/explosionFrameCount)-12);
+            }
+        }
     }
 
-    explosionFrameCounter++;
-    if(explosionFrameCounter >= (60/explosionFramesSpeed)){
-        explosionFrameCounter = 0;
-        explosionCurrentFrame++;
+    if(missSplashActive){
+        missSplashFrameCounter++;
+        if(missSplashFrameCounter >= (60/missSplashFramesSpeed)){
+            missSplashFrameCounter = 0;
+            missSplashCurrentFrame++;
 
-        if(explosionCurrentFrame >= explosionFrameCount){
-            explosionCurrentFrame = 0;
-            explosionFrameRec.x = 0;
-            explosionActive = false;
-            return;
+            if(missSplashCurrentFrame >= missSplashFrameCount){
+                missSplashCurrentFrame = 0;
+                missSplashFrameRec = missSplashFrames[0];
+                missSplashActive = false;
+            }
+            else{
+                missSplashFrameRec = missSplashFrames[missSplashCurrentFrame];
+            }
         }
-
-        explosionFrameRec.x = static_cast<float>(explosionCurrentFrame) * (static_cast<float>(Explosion.width/explosionFrameCount)-12);
     }
 }
 
@@ -129,8 +162,21 @@ void Board::DrawExplosion(){
     }
 }
 
-bool Board::IsExplosionActive() const{
-    return explosionActive;
+void Board::DrawMissSplashAnimation(){
+    if(missSplashActive){
+        const float splashScale = 0.4f;
+        Rectangle destRec = {
+            missSplashPosition.x,
+            missSplashPosition.y,
+            missSplashFrameRec.width * splashScale,
+            missSplashFrameRec.height * splashScale
+        };
+        DrawTexturePro(MissSplashAnimation, missSplashFrameRec, destRec, {0, 0}, 0.0f, WHITE);
+    }
+}
+
+bool Board::IsShotAnimationActive() const{
+    return explosionActive || missSplashActive;
 }
 
 void Board::StartExplosionAtTile(int row, int col){
@@ -143,6 +189,19 @@ void Board::StartExplosionAtTile(int row, int col){
     explosionFrameCounter = 0;
     explosionFrameRec.x = 0;
     explosionActive = true;
+}
+
+void Board::StartMissSplashAtTile(int row, int col){
+    const Tile& tile = grid.at(row).at(col);
+    const float splashScale = 0.4f;
+    missSplashFrameRec = missSplashFrames[0];
+    missSplashPosition = {
+        tile.rect.x + tile.rect.width/2.0f - (missSplashFrameRec.width * splashScale)/2.0f,
+        tile.rect.y + tile.rect.height/2.0f - (missSplashFrameRec.height * splashScale)/2.0f
+    };
+    missSplashCurrentFrame = 0;
+    missSplashFrameCounter = 0;
+    missSplashActive = true;
 }
 
 
@@ -228,7 +287,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = false;
-                    //should play the miss splash animation on that tile
+                    StartMissSplashAtTile(row, col);
                     return true;
                     break;
                 case TileState::Ship:

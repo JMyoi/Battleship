@@ -119,15 +119,13 @@ bool Player::drawTrackingBoard(ShotResult& res){
     int sunkCount = 0;
     for(Ship& ship: ships){
         if(ship.isSunk()){
-        if(ship.isSunk()){
             sunkCount++;
-            ship.drawSunken(); // parameter for fading the ship, tint fre
-        }
             ship.drawSunken(); // parameter for fading the ship, tint fre
         }
     }
     playerBoard.DrawHitsAndMiss(start);// should draw here and be rendered last after the board and the sunken ships
-    playerBoard.DrawExplosion();
+    playerBoard.DrawExplosion(); // will only draw when active
+    playerBoard.DrawMissSplashAnimation();
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
     float bottomOfGrid = start.y + 10 * TileHeight;
@@ -135,8 +133,9 @@ bool Player::drawTrackingBoard(ShotResult& res){
     ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2),
     (int)(bottomOfGrid + 45),
     25, BLACK);
+
     if(shotPendingTransition){
-        if(!playerBoard.IsExplosionActive()){
+        if(!playerBoard.IsShotAnimationActive()){
             res = pendingShotResult;
             shotPendingTransition = false;
             pendingShotResult = ShotResult::AlreadyFired;
@@ -159,19 +158,25 @@ bool Player::drawTrackingBoard(ShotResult& res){
             }
             pendingShotResult = result;
             shotPendingTransition = true;
-            if(!playerBoard.IsExplosionActive()){
+            if(!playerBoard.IsShotAnimationActive()){
+                res = pendingShotResult;
+                shotPendingTransition = false;
+                pendingShotResult = ShotResult::AlreadyFired;
+                return true; // to change to next game state when the explosion animation is done.
+            }
+            return false; // to not transition to next game state and wait till animation is done.
+        }
+        else if(result == ShotResult::Miss){
+            cout<<"You've Missed at: "<<pos.row<<", "<<pos.col<<endl;
+            pendingShotResult = result;
+            shotPendingTransition = true;
+            if(!playerBoard.IsShotAnimationActive()){
                 res = pendingShotResult;
                 shotPendingTransition = false;
                 pendingShotResult = ShotResult::AlreadyFired;
                 return true;
             }
             return false;
-        }
-        else if(result == ShotResult::Miss){
-            cout<<"You've Missed at: "<<pos.row<<", "<<pos.col<<endl;
-            //change state to next player transition screen.
-            res = result; // result is miss
-            return true;
         } 
         else if(result == ShotResult::AlreadyFired){
             cout<<"You've Already Fired at: "<<pos.row<<", "<<pos.col<<endl;
