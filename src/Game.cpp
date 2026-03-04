@@ -203,14 +203,17 @@ void Game::drawP2Turn(){
 
 void Game::drawGameOver(){
     const char* text = "GameOver";
-    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    int centerX = GetScreenWidth() / 2;
+    int centerY = GetScreenHeight() / 2;
+    DrawText(text, centerX - MeasureText(text, 50) / 2, centerY - 100, 50, WHITE);
     //display who wins
     if(player1.checkGameOver()){
-        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 2 Wins", 30) / 2, 100, 30, BLACK);
+        const char* winner = "player 2 Wins";
+        DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
     else{
-        DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
-
+        const char* winner = "player 1 Wins";
+        DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
 }
 
