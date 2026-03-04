@@ -13,6 +13,8 @@ int main(void)
     SetTargetFPS(60);
     Game game;
 
+   
+
     
     while (!WindowShouldClose())
     {
@@ -20,6 +22,8 @@ int main(void)
         //2. Draw
         BeginDrawing();
             ClearBackground(RAYWHITE);
+            
+    
 
             switch(GameState state = game.getGameState()){
 

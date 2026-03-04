@@ -20,6 +20,7 @@ class Ship{
         void drawShip(Vector2 newPos);// vertical by default
         void drawShipHorizontal(Vector2 newPos);
         void draw(); // draw the ship that has a position set from placement. 
+        void drawSunken();
         bool shipClicked();
         bool isPlaced();
         void shipHitAt(position pos);

@@ -14,6 +14,7 @@ class Tile{
         Rectangle rect; // has x, y, width, height
         TileState state;
         Texture impact; // used to indicate hit
+        Texture missSplash;//used to indicate miss
         // member funcitons
         Tile();
         void Draw();
@@ -30,5 +31,6 @@ class Board{
         bool HandleFire(ShotResult& result, position& at); // checks for a click on board and tries to verify hit or miss.
     private:
         vector<vector<Tile>> grid; // 2D grid of tiles
+        Texture2D Ocean;
 
 };

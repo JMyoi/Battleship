@@ -87,7 +87,7 @@ void Ship::drawShip(Vector2 newPos){
         UnloadImage(img);
     }
     DrawTextureV(sprite, newPos, WHITE);
-    DrawRectangleLinesEx(shipRect, 1, BLACK);
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
 }
 
 void Ship::drawShipHorizontal(Vector2 newPos){
@@ -103,17 +103,24 @@ void Ship::drawShipHorizontal(Vector2 newPos){
         UnloadImage(img);
     }
     DrawTextureV(sprite, newPos, WHITE);
-    DrawRectangleLinesEx(shipRect, 1, BLACK);
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
 }
 
 
 void Ship::draw(){
     // draw the ship that has a position set from placement. 
-    DrawRectangleLinesEx(shipRect, 1, BLACK);
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
     //DrawText(to_string(size).c_str(), shipRect.x, shipRect.y, 20, BLACK);
     Vector2 pos = {shipRect.x, shipRect.y};
     DrawTextureV(sprite, pos, WHITE);
 
+}
+
+void Ship::drawSunken(){
+    //draw ship with low opacity shifted to the right, so it lands on tracking board
+    float newX = 550 + shipRect.x;
+    Vector2 pos = {newX, shipRect.y};
+    DrawTextureV(sprite, pos, {255,255,255,180});
 }
 
 bool Ship::shipClicked(){

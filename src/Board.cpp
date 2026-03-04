@@ -10,6 +10,7 @@ using namespace std;
 Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
+
     // crop the top right corner from poof.png
     Image img = LoadImage("src/assets/Poof.png");
     //width 2000, height 1400
@@ -20,7 +21,15 @@ Tile::Tile(){
     crop = {300, 80, 170, 170};
     ImageCrop(&img, crop);
     ImageResize(&img,50,50);
-    impact = LoadTextureFromImage(img);    
+    impact = LoadTextureFromImage(img);     
+
+    //load the miss splash
+    img = LoadImage("src/assets/drip.png");
+    crop = {570, 400,340,270};
+    ImageCrop(&img, crop);
+    ImageResize(&img,50,50);
+    missSplash = LoadTextureFromImage(img);  
+
 }
 
 
@@ -41,6 +50,7 @@ void Tile::drawHitsAndMiss(){
     }
     case TileState::Miss:{
         DrawCircle(centerX, centerY, 10, BLUE);
+        DrawTextureV(missSplash, {rect.x, rect.y}, WHITE);
         //render the drip
          break;
     }
@@ -68,11 +78,18 @@ Board::Board(){
     for(int i = 0; i < 10; i++){
         grid.at(i).resize(10);
     }
+
+    //render background ocean
+    Image img = LoadImage("src/assets/Ocean.png");
+    ImageResize(&img, 500, 500);
+    Ocean = LoadTextureFromImage(img);
 }
 
 
 //draws the players board, 
 void Board::Draw(Vector2 start){
+    //background ocean
+    DrawTextureV(Ocean,start,WHITE);
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
     float TileHeight = 50; // 50
     float TileX = start.x;  
