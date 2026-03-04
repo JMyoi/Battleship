@@ -92,6 +92,7 @@ void Player::drawBoard(){
     Vector2 start = {50, 100};
     playerBoard.Draw(start);
     drawShipsonBoard();
+    playerBoard.DrawHitsAndMiss(start);
     //draw how much Ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
@@ -100,12 +101,11 @@ void Player::drawBoard(){
     }
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
-float bottomOfGrid = start.y + 10 * TileHeight;
-DrawText(sunkText.c_str(),
+    float bottomOfGrid = start.y + 10 * TileHeight;
+    DrawText(sunkText.c_str(),
          (GetScreenWidth()/4 - MeasureText(sunkText.c_str(),25)/2),
          (int)(bottomOfGrid + 45),   // under the letter
          25, BLACK);
-
 }
 
 //should return true if hit or miss is registered and update the result argument so that the game can change it's state and have information if the player hit or miss.
@@ -115,16 +115,19 @@ bool Player::drawTrackingBoard(ShotResult& res){
     //draw how much ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
-        if(ship.isSunk())
+        if(ship.isSunk()){
             sunkCount++;
+            ship.drawSunken(); // parameter for fading the ship, tint fre
+        }
     }
+    playerBoard.DrawHitsAndMiss(start);// should draw here and be rendered last after the board and the sunken ships
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
-float bottomOfGrid = start.y + 10 * TileHeight;
-DrawText(sunkText.c_str(),
-         ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2),
-         (int)(bottomOfGrid + 45),
-         25, BLACK);
+    float bottomOfGrid = start.y + 10 * TileHeight;
+    DrawText(sunkText.c_str(),
+    ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2),
+    (int)(bottomOfGrid + 45),
+    25, BLACK);
     //handle click on tile.
     ShotResult result; // result will be put here, hit, miss, alreadyFired
     position pos; // position at the fire attempt will be stored here, row, col, hit.
@@ -155,6 +158,7 @@ DrawText(sunkText.c_str(),
     return false;
     
 }
+
 bool Player::checkGameOver(){
     //check if all ships are sunk
     bool allSunk = true;// assume true first

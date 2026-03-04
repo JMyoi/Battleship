@@ -1,6 +1,7 @@
 #include "Ship.hpp"
 #include <vector>
 #include <iostream>
+#include "raylib.h"
 #include <string>
 using namespace std;
 
@@ -16,67 +17,110 @@ Ship::Ship(int size){
         positions.at(i).row = -1;
         positions.at(i).col = -1;
     }
+    // assign the correct image based on size
+    //adjust to vertical default and correct size.
+    //void ImageResize(Image *image, int newWidth, int newHeight);   // Resize image (Bicubic scaling algorithm)
+    //void ImageRotate(Image *image, int degrees);      // Rotate image by input angle in degrees (-359 to 359)
+    Image img;
+    switch (size)
+    {
+        case 1: {
+            img = LoadImage("src/assets/oneTwo.png");
+            ImageRotate(&img,90);
+            //might just leave it
+            float h = static_cast<float>(img.height);
+            float w = static_cast<float>(img.width);
+            Rectangle crop = {0, 25, w, h/2};
+            //crop for the tip, 
+            ImageCrop(&img, crop);
+            ImageResize(&img, 50, height); 
+            sprite = LoadTextureFromImage(img);
+            break;
+        }
+        case 2: {
+            img = LoadImage("src/assets/oneTwo.png");
+            ImageRotate(&img,90);
+            ImageResize(&img, 50, height);
+            sprite = LoadTextureFromImage(img);
+            UnloadImage(img);
+            break;
+        }
+        case 3: {
+            img = LoadImage("src/assets/three.png");
+            ImageRotate(&img,90);
+            ImageResize(&img, 50, height);
+            sprite = LoadTextureFromImage(img);
+            UnloadImage(img);
+            break;
+        }
+        case 4: {
+            img = LoadImage("src/assets/four.png");
+            ImageRotate(&img,90);
+            ImageResize(&img, 50, height);
+            sprite = LoadTextureFromImage(img);
+            UnloadImage(img);
+            break;
+        }
+        case 5: {
+            img = LoadImage("src/assets/five.png");
+            ImageRotate(&img,90);
+            ImageResize(&img, 50, height);
+            sprite = LoadTextureFromImage(img); 
+            UnloadImage(img);
+            break;
+        }
+    }
 
 }
 
 // draws ship for setup phase vertical version
 void Ship::drawShip(Vector2 newPos){
-    // make ship rectangle vertical, in case it was horizontal and switches back 
+    // make ship rectangle vertical, in case it was horizontal and switches back
     int height = 50*size;
     shipRect = {newPos.x, newPos.y, 50, float(height)};
-    direction = Direction::Vertical;
-    switch (size)
-    {
-    case 1:
-        DrawRectangleRec(shipRect, GRAY);
-
-        break;
-    case 2:
-        DrawRectangleRec(shipRect, DARKGRAY);
-        break;
-
-    case 3:
-        DrawRectangleRec(shipRect, BROWN);
-        break;
-    case 4:
-        DrawRectangleRec(shipRect, DARKBROWN);
-        break;
-    case 5:
-        DrawRectangleRec(shipRect, BEIGE);
-        break;
-
+    // only rotate if direction changed
+    if(direction != Direction::Vertical){
+        direction = Direction::Vertical;
+        Image img = LoadImageFromTexture(sprite);
+        ImageRotate(&img,90);
+        sprite = LoadTextureFromImage(img);
+        UnloadImage(img);
     }
-    DrawText(to_string(size).c_str(), newPos.x, newPos.y, 20, BLACK);
-
+    DrawTextureV(sprite, newPos, WHITE);
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
 }
 
 void Ship::drawShipHorizontal(Vector2 newPos){
     //make ship rectangle horizontal, height = 50, width = 50*size
     int width = 50*size;
     shipRect = {newPos.x, newPos.y, float(width), 50};
-    direction = Direction::Horizontal;
-    switch (size)
-    {
-    case 1:
-        DrawRectangleRec(shipRect, GRAY);
-
-        break;
-    case 2:
-        DrawRectangleRec(shipRect, DARKGRAY);
-        break;
-
-    case 3:
-        DrawRectangleRec(shipRect, BROWN);
-        break;
-    case 4:
-        DrawRectangleRec(shipRect, DARKBROWN);
-        break;
-    case 5:
-        DrawRectangleRec(shipRect, BEIGE);
-        break;
-
+    // only rotate if direction changed
+    if(direction != Direction::Horizontal){
+        direction = Direction::Horizontal;
+        Image img = LoadImageFromTexture(sprite);
+        ImageRotate(&img,-90);
+        sprite = LoadTextureFromImage(img);
+        UnloadImage(img);
     }
-    DrawText(to_string(size).c_str(), newPos.x, newPos.y, 20, BLACK);
+    DrawTextureV(sprite, newPos, WHITE);
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
+}
+
+
+void Ship::draw(){
+    // draw the ship that has a position set from placement. 
+    //DrawRectangleLinesEx(shipRect, 1, BLACK);
+    //DrawText(to_string(size).c_str(), shipRect.x, shipRect.y, 20, BLACK);
+    Vector2 pos = {shipRect.x, shipRect.y};
+    DrawTextureV(sprite, pos, WHITE);
+
+}
+
+void Ship::drawSunken(){
+    //draw ship with low opacity shifted to the right, so it lands on tracking board
+    float newX = 550 + shipRect.x;
+    Vector2 pos = {newX, shipRect.y};
+    DrawTextureV(sprite, pos, {255,255,255,180});
 }
 
 bool Ship::shipClicked(){
@@ -131,30 +175,4 @@ bool Ship::isSunk(){
     return sunk;
 }
 
-void Ship::draw(){
-    // draw the ship that has a position set from placement. 
-    switch (size)
-    {
-    case 1:
-        DrawRectangleRec(shipRect, GRAY);
-
-        break;
-    case 2:
-        DrawRectangleRec(shipRect, DARKGRAY);
-        break;
-
-    case 3:
-        DrawRectangleRec(shipRect, BROWN);
-        break;
-    case 4:
-        DrawRectangleRec(shipRect, DARKBROWN);
-        break;
-    case 5:
-        DrawRectangleRec(shipRect, BEIGE);
-        break;
-
-    }
-    DrawText(to_string(size).c_str(), shipRect.x, shipRect.y, 20, BLACK);
-
-}
 

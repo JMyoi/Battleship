@@ -10,26 +10,58 @@ using namespace std;
 Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
+
+    // crop the top right corner from poof.png
+    Image img = LoadImage("src/assets/Poof.png");
+    //width 2000, height 1400
+    float h = static_cast<float>(img.height/3); 
+    float w = static_cast<float>(img.width/3); 
+    Rectangle crop = {0, 0, w, h};
+    ImageCrop(&img, crop);
+    crop = {300, 80, 170, 170};
+    ImageCrop(&img, crop);
+    ImageResize(&img,50,50);
+    impact = LoadTextureFromImage(img);     
+
+    //load the miss splash
+    img = LoadImage("src/assets/drip.png");
+    crop = {570, 400,340,270};
+    ImageCrop(&img, crop);
+    ImageResize(&img,50,50);
+    missSplash = LoadTextureFromImage(img);  
+
 }
+
 
 void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
-    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
+}
+
+void Tile::drawHitsAndMiss(){
     int centerX = rect.x + 25; // height and width is default 50, 50/2 = 25.
     int centerY = rect.y + 25;
+    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
     switch (state)
     {
-    case TileState::Hit:
-       DrawCircle(centerX, centerY, 10, RED);
+    case TileState::Hit:{
+       //DrawCircle(centerX, centerY, 10, RED);
+       DrawTextureV(impact, {rect.x, rect.y}, WHITE);
         break;
-    case TileState::Miss:
-       DrawCircle(centerX, centerY, 10, BLUE);
-        break;
+    }
+    case TileState::Miss:{
+        DrawCircle(centerX, centerY, 10, BLUE);
+        DrawTextureV(missSplash, {rect.x, rect.y}, WHITE);
+        //render the drip
+         break;
+    }
     case TileState::Empty:
     case TileState::Ship:
         break;
     }
+
 }
+
+
 bool Tile::isClicked(){
     if(CheckCollisionPointRec(GetMousePosition(), rect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON))
         return true;
@@ -47,11 +79,17 @@ Board::Board(){
         grid.at(i).resize(10);
     }
 
+    //render background ocean
+    Image img = LoadImage("src/assets/Ocean.png");
+    ImageResize(&img, 500, 500);
+    Ocean = LoadTextureFromImage(img);
 }
 
 
 //draws the players board, 
 void Board::Draw(Vector2 start){
+    //background ocean
+    DrawTextureV(Ocean,start,WHITE);
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
     float TileHeight = 50; // 50
     float TileX = start.x;  
@@ -95,6 +133,15 @@ void Board::Draw(Vector2 start){
         }
 
 }
+void Board::DrawHitsAndMiss(Vector2 start){
+    // assign all tiles appropriate width, height,  and position 
+        for(int row = 0; row<10; row++){
+            for(int col = 0; col<10; col++){
+                grid.at(row).at(col).drawHitsAndMiss();
+            }
+        }
+
+}
 
 /* Trackingboard funciton calls this funciton,
 should return true only if a tile is clicked
@@ -119,6 +166,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = false;
+                    //should play the miss splash animation on that tile
                     return true;
                     break;
                 case TileState::Ship:
@@ -127,6 +175,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = true;
+                    // should play the explosion animation on that tile.
                     return true;
                     break;
                 case TileState::Hit:
