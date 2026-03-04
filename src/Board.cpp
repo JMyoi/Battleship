@@ -4,6 +4,59 @@
 #include <vector>
 #include <iostream>
 using namespace std;
+// ===== Shared textures (load once) =====
+static bool gTexturesLoaded = false;
+
+static Texture2D gImpact = {};          // cropped Poof
+static Texture2D gMissSplash = {};      // cropped drip
+static Texture2D gOcean = {};           // resized ocean
+static Texture2D gExplosion = {};       // explosion sprite sheet
+static Texture2D gMissSplashAnim = {};  // poofDrip animation
+
+static Texture2D LoadCropped(const char* path, Rectangle crop, int w, int h) {
+    Image img = LoadImage(path);
+    ImageCrop(&img, crop);
+    ImageResize(&img, w, h);
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return tex;
+}
+
+static Texture2D LoadResized(const char* path, int w, int h) {
+    Image img = LoadImage(path);
+    ImageResize(&img, w, h);
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return tex;
+}
+
+static void LoadSharedTexturesOnce() {
+    if (gTexturesLoaded) return;
+
+    gImpact     = LoadCropped("src/assets/Poof.png", {300, 80, 170, 170}, 50, 50);
+    gMissSplash = LoadCropped("src/assets/drip.png", {570, 400, 340, 270}, 50, 50);
+
+    gOcean      = LoadResized("src/assets/Ocean.png", 500, 500);
+
+    gExplosion  = LoadTexture("src/assets/Explosion.png");
+    gMissSplashAnim = LoadTexture("src/assets/poofDrip.png");
+    SetTextureFilter(gMissSplashAnim, TEXTURE_FILTER_POINT);
+
+    gTexturesLoaded = true;
+}
+
+static void UnloadSharedTextures() {
+    if (!gTexturesLoaded) return;
+
+    UnloadTexture(gImpact);
+    UnloadTexture(gMissSplash);
+    UnloadTexture(gOcean);
+    UnloadTexture(gExplosion);
+    UnloadTexture(gMissSplashAnim);
+
+    gTexturesLoaded = false;
+}
+// ===== End shared textures =====
 
 //Tile Implementation
 
@@ -11,24 +64,7 @@ Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
 
-    // crop the top right corner from poof.png
-    Image img = LoadImage("src/assets/Poof.png");
-    //width 2000, height 1400
-    float h = static_cast<float>(img.height/3); 
-    float w = static_cast<float>(img.width/3); 
-    Rectangle crop = {0, 0, w, h};
-    ImageCrop(&img, crop);
-    crop = {300, 80, 170, 170}; // values deduced using tiral and error
-    ImageCrop(&img, crop);
-    ImageResize(&img,50,50);
-    impact = LoadTextureFromImage(img);     
-
-    //load the miss splash
-    img = LoadImage("src/assets/drip.png");
-    crop = {570, 400,340,270}; // values deduced using tiral and error
-    ImageCrop(&img, crop);
-    ImageResize(&img,50,50);
-    missSplash = LoadTextureFromImage(img);  
+     LoadSharedTexturesOnce();
     
 
 }
@@ -48,12 +84,12 @@ void Tile::drawHitsAndMiss(){
     {
     case TileState::Hit:{
        //DrawCircle(centerX, centerY, 10, RED);
-       DrawTextureV(impact, {rect.x, rect.y}, WHITE);
+       DrawTextureV(gImpact, {rect.x, rect.y}, WHITE);
         break;
     }
     case TileState::Miss:{
         DrawCircle(centerX, centerY, 10, BLUE);
-        DrawTextureV(missSplash, {rect.x, rect.y}, WHITE);
+        DrawTextureV(gMissSplash, {rect.x, rect.y}, WHITE);
         //render the drip
          break;
     }
