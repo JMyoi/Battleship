@@ -154,6 +154,11 @@ bool Player::drawTrackingBoard(ShotResult& res){
             for(Ship& ship: ships){
                 if(ship.matchingAt(pos)){
                     ship.shipHitAt(pos);
+                    // if that hit made the ship sink then play the ace sound.
+                    if(ship.isSunk()){
+                        ship.playAce();
+                    }
+                    
                 }
             }
             pendingShotResult = result;

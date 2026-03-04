@@ -136,9 +136,9 @@ Board::Board(){
     static_cast<float>(Explosion.height)};
     explosionCurrentFrame = 0;
     explosionFrameCounter = 0;
-    explosionFramesSpeed = 8;
+    explosionFramesSpeed = 10;
     explosionActive = false;
-
+        //load miss splash 
     MissSplashAnimation = LoadTexture("src/assets/poofDrip.png");
     SetTextureFilter(MissSplashAnimation, TEXTURE_FILTER_POINT);
     missSplashFrameCount = 6;
@@ -152,8 +152,12 @@ Board::Board(){
     missSplashPosition = {0, 0};
     missSplashCurrentFrame = 0;
     missSplashFrameCounter = 0;
-    missSplashFramesSpeed = 12;
+    missSplashFramesSpeed = 14;
     missSplashActive = false;
+
+    //Load sounds
+    MissSplash = LoadSound("src/assets/missSplash.mp3");
+    HitBoom = LoadSound("src/assets/HitExplosion.mp3");
 }
 
 void Board::UpdateAnimations(){
@@ -323,6 +327,8 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = false;
+                    //play miss fire sound
+                    PlaySound(MissSplash);
                     StartMissSplashAtTile(row, col);
                     return true;
                     break;
@@ -332,6 +338,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = true;
+                    PlaySound(HitBoom);
                     StartExplosionAtTile(row, col);
                     return true;
                     break;

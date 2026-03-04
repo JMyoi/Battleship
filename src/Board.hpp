@@ -57,6 +57,10 @@ class Board{
         int missSplashFrameCount;
         bool missSplashActive;
 
+        //firing Sounds for miss and hit
+        Sound HitBoom;
+        Sound MissSplash;
+
         void StartExplosionAtTile(int row, int col);
         void StartMissSplashAtTile(int row, int col);
 
