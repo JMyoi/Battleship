@@ -62,7 +62,7 @@ bool Player::drawSetupBoard(){
         }
         else{
             //error message from attempted placement
-            DrawText(ErrorMessage.c_str(), (GetScreenWidth()/2 + 50), 600, 15, RED);
+            DrawText(ErrorMessage.c_str(), (GetScreenWidth()/2 + 50), 600, 20, RED);
         }
     }
 
