@@ -29,6 +29,7 @@ Tile::Tile(){
     ImageCrop(&img, crop);
     ImageResize(&img,50,50);
     missSplash = LoadTextureFromImage(img);  
+    
 
 }
 
@@ -83,6 +84,60 @@ Board::Board(){
     Image img = LoadImage("src/assets/Ocean.png");
     ImageResize(&img, 500, 500);
     Ocean = LoadTextureFromImage(img);
+    UnloadImage(img);
+
+    // load explosion sprite with animation info
+    Explosion = LoadTexture("src/assets/Explosion.png");
+    explosionFrameCount = 7;
+    explosionPosition = {0, 0};
+    explosionFrameRec = {0, 0, static_cast<float>(Explosion.width/explosionFrameCount)-12, static_cast<float>(Explosion.height)};
+    explosionCurrentFrame = 0;
+    explosionFrameCounter = 0;
+    explosionFramesSpeed = 8;
+    explosionActive = false;
+}
+
+void Board::UpdateAnimations(){
+    if(!explosionActive){
+        return;
+    }
+
+    explosionFrameCounter++;
+    if(explosionFrameCounter >= (60/explosionFramesSpeed)){
+        explosionFrameCounter = 0;
+        explosionCurrentFrame++;
+
+        if(explosionCurrentFrame >= explosionFrameCount){
+            explosionCurrentFrame = 0;
+            explosionFrameRec.x = 0;
+            explosionActive = false;
+            return;
+        }
+
+        explosionFrameRec.x = static_cast<float>(explosionCurrentFrame) * (static_cast<float>(Explosion.width/explosionFrameCount)-12);
+    }
+}
+
+void Board::DrawExplosion(){
+    if(explosionActive){
+        DrawTextureRec(Explosion, explosionFrameRec, explosionPosition, WHITE);
+    }
+}
+
+bool Board::IsExplosionActive() const{
+    return explosionActive;
+}
+
+void Board::StartExplosionAtTile(int row, int col){
+    const Tile& tile = grid.at(row).at(col);
+    explosionPosition = {
+        tile.rect.x + tile.rect.width/2.0f - explosionFrameRec.width/2.0f,
+        tile.rect.y + tile.rect.height/2.0f - explosionFrameRec.height/2.0f
+    };
+    explosionCurrentFrame = 0;
+    explosionFrameCounter = 0;
+    explosionFrameRec.x = 0;
+    explosionActive = true;
 }
 
 
@@ -175,7 +230,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = true;
-                    // should play the explosion animation on that tile.
+                    StartExplosionAtTile(row, col);
                     return true;
                     break;
                 case TileState::Hit:

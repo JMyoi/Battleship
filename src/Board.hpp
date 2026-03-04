@@ -27,10 +27,23 @@ class Board{
         Board();
         void Draw(Vector2 start); 
         void DrawHitsAndMiss(Vector2 start); // because the ship renders over the hits form Draw(), we need a separate funciton to call after the ships are rendered.
+        void UpdateAnimations();
+        void DrawExplosion();
+        bool IsExplosionActive() const;
         bool HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction,string& ErrorMessage); // returns true if the ship is placed and false if not.
         bool HandleFire(ShotResult& result, position& at); // checks for a click on board and tries to verify hit or miss.
     private:
         vector<vector<Tile>> grid; // 2D grid of tiles
         Texture2D Ocean;
+        Texture2D Explosion;
+        Vector2 explosionPosition;
+        Rectangle explosionFrameRec;
+        int explosionCurrentFrame;
+        int explosionFrameCounter;
+        int explosionFramesSpeed;
+        int explosionFrameCount;
+        bool explosionActive;
+
+        void StartExplosionAtTile(int row, int col);
 
 };

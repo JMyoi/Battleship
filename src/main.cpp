@@ -11,14 +11,15 @@ int main(void)
     InitWindow(screenWidth, screenHeight, "Battleship");
 
     SetTargetFPS(60);
-    Game game;
+    //Game game;
 
     Texture2D Explosion = LoadTexture("src/assets/Explosion.png");
     Vector2 position = {0,0};
     Rectangle frameRec = {0, 0, static_cast<float>(Explosion.width/7)-12, static_cast<float>(Explosion.height)};//-20 because it's leaking a bit to the left
     int currentFrame = 0;
     int frameCounter = 0;
-    int framesSpeed = 2;
+    int framesSpeed = 8;
+    bool active = false;
 
    
 
@@ -26,22 +27,40 @@ int main(void)
     while (!WindowShouldClose())
     {
         //1, Event handling and update
+       if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT) && !active)
+        {
+            position = GetMousePosition();
+            active = true;
 
-        frameCounter++;
-        if(frameCounter >=(60/framesSpeed)){
+            // center using ONE frame size (not full spritesheet size)
+            position.x -= frameRec.width / 2.0f;
+            position.y -= frameRec.height / 2.0f;
+
+            currentFrame  = 0;
             frameCounter = 0;
-            currentFrame++;
+            // active = true;   // redundant, can remove
+        }
+        if(active){
+            frameCounter++;
+            if(frameCounter >=(60/framesSpeed)){
+                frameCounter = 0;
+                currentFrame++;
+    
+                if(currentFrame>6) {
+                    currentFrame= 0;
+                    active = false;
+                }
+    
+                frameRec.x = (static_cast<float>(currentFrame)) * (static_cast<float>(Explosion.width/7)-12);
+            }
 
-            if(currentFrame>6) 
-                currentFrame= 0;
-
-            frameRec.x = (static_cast<float>(currentFrame)) * (static_cast<float>(Explosion.width/7)-12);
         }
 
         //2. Draw
         BeginDrawing();
             ClearBackground(RAYWHITE);
-            DrawTextureRec(Explosion, frameRec, position, WHITE);
+            if(active)
+                DrawTextureRec(Explosion, frameRec, position, WHITE);
     
 
             // switch(GameState state = game.getGameState()){

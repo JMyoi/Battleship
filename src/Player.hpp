@@ -19,6 +19,8 @@ class Player{
     private:
         Board playerBoard;
         vector<Ship> ships;
+        bool shotPendingTransition;
+        ShotResult pendingShotResult;
 
         void drawShipsonBoard(); 
 

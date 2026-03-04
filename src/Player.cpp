@@ -12,6 +12,8 @@ Player::Player(int shipCount){
     for(int i = 0; i < shipCount; i++){
         ships.emplace_back(i + 1);  // Create ship of size (i + 1), 1, 2, 3, ...
     }
+    shotPendingTransition = false;
+    pendingShotResult = ShotResult::AlreadyFired;
     // initialize name
 }
 
@@ -112,6 +114,7 @@ void Player::drawBoard(){
 bool Player::drawTrackingBoard(ShotResult& res){
     Vector2 start = {600, 100};
     playerBoard.Draw(start);
+    playerBoard.UpdateAnimations();
     //draw how much ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
@@ -121,6 +124,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
         }
     }
     playerBoard.DrawHitsAndMiss(start);// should draw here and be rendered last after the board and the sunken ships
+    playerBoard.DrawExplosion();
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
     float bottomOfGrid = start.y + 10 * TileHeight;
@@ -128,6 +132,16 @@ bool Player::drawTrackingBoard(ShotResult& res){
     ((GetScreenWidth()/4)*3 - MeasureText(sunkText.c_str(),25)/2),
     (int)(bottomOfGrid + 45),
     25, BLACK);
+    if(shotPendingTransition){
+        if(!playerBoard.IsExplosionActive()){
+            res = pendingShotResult;
+            shotPendingTransition = false;
+            pendingShotResult = ShotResult::AlreadyFired;
+            return true;
+        }
+        return false;
+    }
+
     //handle click on tile.
     ShotResult result; // result will be put here, hit, miss, alreadyFired
     position pos; // position at the fire attempt will be stored here, row, col, hit.
@@ -140,9 +154,15 @@ bool Player::drawTrackingBoard(ShotResult& res){
                     ship.shipHitAt(pos);
                 }
             }
-            //change state to next player transition screen
-            res = result; // res = Hit
-            return true;
+            pendingShotResult = result;
+            shotPendingTransition = true;
+            if(!playerBoard.IsExplosionActive()){
+                res = pendingShotResult;
+                shotPendingTransition = false;
+                pendingShotResult = ShotResult::AlreadyFired;
+                return true;
+            }
+            return false;
         }
         else if(result == ShotResult::Miss){
             cout<<"You've Missed at: "<<pos.row<<", "<<pos.col<<endl;
