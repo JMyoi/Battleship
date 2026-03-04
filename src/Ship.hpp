@@ -26,6 +26,7 @@ class Ship{
         void shipHitAt(position pos);
         bool matchingAt(position pos); // returns true if there are any ship unit positions that match the given arguments position.
         bool isSunk();
+        void playAce();
 
     private:
         int size;
@@ -34,6 +35,7 @@ class Ship{
         Direction direction; 
         //ship texture and image based on size
         Texture2D sprite;
+        Sound Ace;
 
 
 

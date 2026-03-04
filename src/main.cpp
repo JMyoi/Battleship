@@ -9,17 +9,20 @@ int main(void)
     const int screenWidth = 1150;
     const int screenHeight = 800;
     InitWindow(screenWidth, screenHeight, "Battleship");
+    InitAudioDevice();             
+
+    //loading background music
+    Music BGM = LoadMusicStream("src/assets/AttackonTitansuite.mp3");
+    PlayMusicStream(BGM);
 
     SetTargetFPS(60);
     Game game;
 
     
-    
-
-    
     while (!WindowShouldClose())
     {
 
+        UpdateMusicStream(BGM);
 
         //2. Draw
         BeginDrawing();
