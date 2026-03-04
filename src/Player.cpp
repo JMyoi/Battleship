@@ -119,7 +119,10 @@ bool Player::drawTrackingBoard(ShotResult& res){
     int sunkCount = 0;
     for(Ship& ship: ships){
         if(ship.isSunk()){
+        if(ship.isSunk()){
             sunkCount++;
+            ship.drawSunken(); // parameter for fading the ship, tint fre
+        }
             ship.drawSunken(); // parameter for fading the ship, tint fre
         }
     }

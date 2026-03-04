@@ -38,9 +38,11 @@ void Tile::Draw(){
     DrawRectangleLinesEx(rect, 1, BLACK );
 }
 
+
 void Tile::drawHitsAndMiss(){
     int centerX = rect.x + 25; // height and width is default 50, 50/2 = 25.
     int centerY = rect.y + 25;
+    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
     // based on the state, display different color, red for hit, blue for miss, nothing for miss.
     switch (state)
     {
@@ -60,7 +62,10 @@ void Tile::drawHitsAndMiss(){
         break;
     }
 
+
 }
+
+
 
 
 bool Tile::isClicked(){
@@ -143,6 +148,8 @@ void Board::StartExplosionAtTile(int row, int col){
 
 //draws the players board, 
 void Board::Draw(Vector2 start){
+    //background ocean
+    DrawTextureV(Ocean,start,WHITE);
     //background ocean
     DrawTextureV(Ocean,start,WHITE);
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
