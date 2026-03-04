@@ -81,7 +81,7 @@ g++ main.cpp -o battleship -lraylib -lopengl32 -lgdi32 -lwinmm
 
 Run the program
 
-<img width="865" height="641" alt="image" src="https://github.com/user-attachments/assets/46417d0a-d018-4a4d-b4a8-681da45ed360" />
+<img width="865" height="641" alt="image" src="GameDemo/Screenshot 2026-03-04 at 5.24.30 PM.png" />
 
 Team Members
 
@@ -95,7 +95,7 @@ Console-based testing
 
 Project documentation and final report
 
-Chen, Ray
+Chen, Jay
 
 Raylib graphical user interface implementation
 
