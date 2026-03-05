@@ -66,7 +66,6 @@ Tile::Tile(){
 
      LoadSharedTexturesOnce();
     
-
 }
 
 
@@ -97,8 +96,6 @@ void Tile::drawHitsAndMiss(){
     case TileState::Ship:
         break;
     }
-
-
 }
 
 
@@ -249,8 +246,6 @@ void Board::StartMissSplashAtTile(int row, int col){
 void Board::Draw(Vector2 start){
     //background ocean
     DrawTextureV(Ocean,start,WHITE);
-    //background ocean
-    DrawTextureV(Ocean,start,WHITE);
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
     float TileHeight = 50; // 50
     float TileX = start.x;  
@@ -294,6 +289,7 @@ void Board::Draw(Vector2 start){
         }
 
 }
+
 void Board::DrawHitsAndMiss(Vector2 start){
     // assign all tiles appropriate width, height,  and position 
         for(int row = 0; row<10; row++){

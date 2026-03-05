@@ -21,20 +21,12 @@ Ship::Ship(int size){
     Ace = LoadSound("src/assets/Sovereign Ace.mp3");
     // assign the correct image based on size
     //adjust to vertical default and correct size.
-    //void ImageResize(Image *image, int newWidth, int newHeight);   // Resize image (Bicubic scaling algorithm)
-    //void ImageRotate(Image *image, int degrees);      // Rotate image by input angle in degrees (-359 to 359)
     Image img;
     switch (size)
     {
         case 1: {
             img = LoadImage("src/assets/oneTwo.png");
             ImageRotate(&img,90);
-            // //might just leave it
-            // float h = static_cast<float>(img.height);
-            // float w = static_cast<float>(img.width);
-            // Rectangle crop = {0, 25, w, h/2};
-            // //crop for the tip, 
-            // ImageCrop(&img, crop);
             ImageResize(&img, 50, height); 
             sprite = LoadTextureFromImage(img);
             UnloadImage(img);
