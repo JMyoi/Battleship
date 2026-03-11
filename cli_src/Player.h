@@ -9,7 +9,9 @@
  */
 class Player {
 public:
-    explicit Player(int shipCount = 1);
+    explicit Player(int shipCount = 1,
+                    PlayerType type = PlayerType::Human,
+                    AIDifficulty difficulty = AIDifficulty::None);
 
     Board& board();
     const Board& board() const;
@@ -20,14 +22,27 @@ public:
     std::vector<Ship>& ships();
     const std::vector<Ship>& ships() const;
 
-    // Fire at enemy board; update tracking board based on result
     ShotResult attack(Player& enemy, Position target);
-
-    // True when all ships are sunk
     bool hasLost() const;
 
+    bool isAI() const;
+    PlayerType type() const;
+    AIDifficulty difficulty() const;
+
+    Position chooseAITarget(const Player& enemy);
+    void updateAIStateAfterShot(Position target, ShotResult result);
+    bool placeAllShipsRandomly();
+
 private:
+    bool isValidPosition(Position p) const;
+    bool isUntriedPosition(Position p) const;
+    void addMediumNeighbors(Position p);
+
     Board m_board;
     TrackingBoard m_tracking;
     std::vector<Ship> m_ships;
+
+    PlayerType m_type;
+    AIDifficulty m_difficulty;
+    std::vector<Position> m_mediumTargets;
 };
