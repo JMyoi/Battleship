@@ -101,4 +101,6 @@ Raylib graphical user interface implementation
 
 UI interaction and gameplay visualization
 
+Sound Design
+
 UI debugging and interface improvements

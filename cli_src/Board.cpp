@@ -117,3 +117,7 @@ CellState Board::cellAt(Position p) const {
     if (!inBounds(p)) return CellState::Empty; // safe fallback
     return m_grid[p.r][p.c];
 }
+bool Board::hasShipAt(Position p) const {
+    if (!inBounds(p)) return false;
+    return m_grid[p.r][p.c] == CellState::Ship;
+}

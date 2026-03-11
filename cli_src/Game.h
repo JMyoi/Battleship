@@ -9,7 +9,11 @@ enum class GameState { SetupP1, SetupP2, TurnP1, TurnP2, GameOver };
  */
 class Game {
 public:
-    explicit Game(int shipCount);
+    explicit Game(int shipCount,
+                  PlayerType p1Type = PlayerType::Human,
+                  PlayerType p2Type = PlayerType::Human,
+                  AIDifficulty p1Difficulty = AIDifficulty::None,
+                  AIDifficulty p2Difficulty = AIDifficulty::None);
 
     GameState state() const;
     int currentPlayerIndex() const; // 0 or 1
@@ -17,14 +21,14 @@ public:
 
     Player& player(int idx);
     const Player& player(int idx) const;
-
-    // Place the next ship for the current setup player (size depends on index)
     bool placeNextShip(Position start, Direction dir);
-
-    // Current player fires at opponent
     ShotResult fire(Position target);
 
+    bool currentPlayerIsAI() const;
+    ShotResult fireAITurn();
+
     bool isOver() const;
+    bool autoPlaceShipsForCurrentPlayer();
 
 private:
     int shipSizeForIndex(int i) const { return i + 1; }
@@ -35,9 +39,9 @@ private:
 
     int m_shipCount;
     GameState m_state;
-    int m_nextShipToPlace; // 0..shipCount-1 within current setup phase
+    int m_nextShipToPlace;
     int m_winner;
-    // add a turn variable that either holds player 1 or 2.
+
     Player m_p1;
     Player m_p2;
 };

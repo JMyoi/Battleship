@@ -39,3 +39,5 @@ struct ShotResult {
     ShotResultType type;
     int sunkShipIndex;  // -1 if not sunk
 };
+enum class PlayerType { Human, AI };
+enum class AIDifficulty { None, Easy, Medium, Hard };
