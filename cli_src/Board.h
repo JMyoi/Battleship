@@ -55,6 +55,7 @@ public:
 
     /// Returns the state of a specific cell.
     CellState cellAt(Position p) const;
+    bool hasShipAt(Position p) const;
 
 private:
 
