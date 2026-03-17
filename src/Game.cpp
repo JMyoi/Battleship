@@ -63,8 +63,7 @@ void Game::drawMenu() {
 
 
 
-void Game::drawP1Setup(){
-    // draw player 1 setup screen
+void Game::drawP1Setup(){// draw player 1 setup screen
     const char* p1text = "Player 1, place your ships";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     // should update state after the player puts a ship on board.
@@ -105,7 +104,7 @@ void Game::drawP1Transition(){
         DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
         break;
     case ShotResult::AlreadyFired:
-        //do nothing
+        //do nothing, this case happens for the first turn only, 
         break;   
      }
     const char* text = "Player 1 Ready?";
@@ -116,11 +115,7 @@ void Game::drawP1Transition(){
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to player 1 Turn or game over .
     if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    if (player1.checkGameOver()) {   // Player 2 has no remaining ships. Record Player 1 as the winner and transition to GameOver.
-        state = GameState::GameOver;
-    } else {
         state = GameState::TurnP1;
-    }
     }
 }
 
@@ -145,11 +140,7 @@ void Game::drawP2Transition(){
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to set up player 2 Turn or game over.
     if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    if (player2.checkGameOver()) {   // Player 1 has no remaining ships. Record Player 2 as the winner and transition to GameOver.
-        state = GameState::GameOver;
-    } else {
         state = GameState::TurnP2;
-    }
     }
 }
 
@@ -163,18 +154,18 @@ void Game::drawP1Turn(){
     // render the players board and it's ships, along with hits, misses, sunken ships.
     player1.drawBoard();
     // render tracking board with info about other players board.
-    // handle click on tracking board in this trakcing board funciton.
+    // handle click on tracking board, if it is clicked it will result in true and log the result
     ShotResult result;
     if (player2.drawTrackingBoard(result)) {
-    CurrResult = result;
-    // Immediately check if Player 2 has lost after Player 1 fires.
-    // If all of Player 2's ships are sunk, transition directly to GameOver
-    if (player2.checkGameOver()) {
-        state = GameState::GameOver;
-    } else {
-        state = GameState::P2Transition;
+        CurrResult = result;
+        // Immediately check if Player 2 has lost after Player 1 fires.
+        // If all of Player 2's ships are sunk, transition directly to GameOver
+        if (player2.checkGameOver()) {
+            state = GameState::GameOver;
+        } else {
+            state = GameState::P2Transition;
+        }
     }
-}
 }
 
 void Game::drawP2Turn(){
@@ -219,7 +210,6 @@ void Game::drawGameOver(){
 
 
 //private helper functions.
-
 
 //updates selectedOption global with the index of the clicked ship count option.
 void Game::getSelectedOption(vector<Rectangle>& options){
