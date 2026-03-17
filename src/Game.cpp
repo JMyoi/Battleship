@@ -10,7 +10,7 @@ using namespace std;
 int selectedOption = -1; 
 
 //constructor
-Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
 
 GameState Game::getGameState(){
     return state;
@@ -18,7 +18,7 @@ GameState Game::getGameState(){
 
 void Game::drawMenu() {
     Vector2 mousePos = GetMousePosition();
-    int centerX = GetScreenWidth() / 2;
+    int centerX = GetScreenWidth() / 2; // used to center text
 
     char title[] = "Battleship";
     DrawText(title, centerX - MeasureText(title, 50) / 2, 100, 50, BLACK);
@@ -29,11 +29,11 @@ void Game::drawMenu() {
     // 5 boxes of 50px wide, 10px gap = total width 290px
     vector<Rectangle> options(5);
     options.at(0) = {(float)(centerX - 145), 310, 50, 50};
-    for(int i = 1; i<5; i++){
+    for(int i = 1; i<5; i++){ //spacing ships out vertically
         options.at(i) = {options.at(i-1).x + 60, 310, 50, 50};
     }
-    // get and handle number of ships selected
-    int selectedOption = getSelectedOption(options);
+    // get and handle number of ship clicked and updates the global variable
+    getSelectedOption(options);
     // draw the rectangles and text.
     for(int i = 0; i<5; i++){
         if(selectedOption == i){
@@ -43,7 +43,6 @@ void Game::drawMenu() {
         }
         DrawText(to_string(i+1).c_str(), options.at(i).x + 15, options.at(i).y + 15, 20, BLACK);
     }
-
     // start button
     Rectangle startButton = {(float)(centerX - 50), 410, 100, 50};
     DrawRectangleRec(startButton, LIGHTGRAY);
@@ -222,17 +221,15 @@ void Game::drawGameOver(){
 //private helper functions.
 
 
-//handles for user click on number of ship option and returns what the user has clicked, 1-5.
-int Game::getSelectedOption(vector<Rectangle>& options){
+//updates selectedOption global with the index of the clicked ship count option.
+void Game::getSelectedOption(vector<Rectangle>& options){
     Vector2 mousePos = GetMousePosition();
     if(IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < options.size(); i++){
             if(CheckCollisionPointRec(mousePos, options.at(i))){
-                // instead of a global variable could we just use our private data member NoOfShips?
+                //update the global variable to keep track of which one has been clicked
                 selectedOption = i;
-                return selectedOption;
             }
         }
     }
-    return selectedOption;
 }

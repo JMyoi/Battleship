@@ -5,38 +5,7 @@ using namespace std;
 
 void DrawParallaxBackground(Texture2D background, Texture2D midgroundOne, Texture2D midgroundTwo, Texture2D foreground,
                             float& scrollingBack, float& scrollingMidOne, float& scrollingMidTwo, float& scrollingFore,
-                            int screenHeight) {
-    const float layerScale = (float)screenHeight / background.height;
-    const float backW = background.width * layerScale;
-    const float mid1W = midgroundOne.width * layerScale;
-    const float mid2W = midgroundTwo.width * layerScale;
-    const float foreW = foreground.width * layerScale;
-
-    // Update scrolling positions
-    scrollingBack -= 0.1f;
-    scrollingMidOne -= 0.3f;
-    scrollingMidTwo -= 0.5f;
-    scrollingFore -= 1.0f;
-
-    // Wrap around when fully scrolled
-    if (scrollingBack <= -backW) scrollingBack = 0;
-    if (scrollingMidOne <= -mid1W) scrollingMidOne = 0;
-    if (scrollingMidTwo <= -mid2W) scrollingMidTwo = 0;
-    if (scrollingFore <= -foreW) scrollingFore = 0;
-
-    // Draw all layers
-    DrawTextureEx(background, (Vector2){ scrollingBack, 0 }, 0.0f, layerScale, WHITE);
-    DrawTextureEx(background, (Vector2){ backW + scrollingBack, 0 }, 0.0f, layerScale, WHITE);
-
-    DrawTextureEx(midgroundOne, (Vector2){ scrollingMidOne, 0 }, 0.0f, layerScale, WHITE);
-    DrawTextureEx(midgroundOne, (Vector2){ mid1W + scrollingMidOne, 0 }, 0.0f, layerScale, WHITE);
-
-    DrawTextureEx(midgroundTwo, (Vector2){ scrollingMidTwo, 0 }, 0.0f, layerScale, WHITE);
-    DrawTextureEx(midgroundTwo, (Vector2){ mid2W + scrollingMidTwo, 0 }, 0.0f, layerScale, WHITE);
-
-    DrawTextureEx(foreground, (Vector2){ scrollingFore, 0 }, 0.0f, layerScale, WHITE);
-    DrawTextureEx(foreground, (Vector2){ foreW + scrollingFore, 0 }, 0.0f, layerScale, WHITE);
-}
+                            int screenHeight);
 
 int main(void)
 {
@@ -50,7 +19,7 @@ int main(void)
     PlayMusicStream(BGM);
 
     SetTargetFPS(60);
-    Game game;
+    Game game; // main game object
 
     //Main Menu backgrounds
     Texture2D MMbackground = LoadTexture("src/assets/Clouds/Clouds 1/1.png");
@@ -152,4 +121,39 @@ int main(void)
     CloseWindow();        
 
     return 0;
+}
+
+void DrawParallaxBackground(Texture2D background, Texture2D midgroundOne, Texture2D midgroundTwo, Texture2D foreground,
+                            float& scrollingBack, float& scrollingMidOne, float& scrollingMidTwo, float& scrollingFore,
+                            int screenHeight) {
+    const float layerScale = (float)screenHeight / background.height;
+    const float backW = background.width * layerScale;
+    const float mid1W = midgroundOne.width * layerScale;
+    const float mid2W = midgroundTwo.width * layerScale;
+    const float foreW = foreground.width * layerScale;
+
+    // Update scrolling positions
+    scrollingBack -= 0.1f;
+    scrollingMidOne -= 0.3f;
+    scrollingMidTwo -= 0.5f;
+    scrollingFore -= 1.0f;
+
+    // Wrap around when fully scrolled
+    if (scrollingBack <= -backW) scrollingBack = 0;
+    if (scrollingMidOne <= -mid1W) scrollingMidOne = 0;
+    if (scrollingMidTwo <= -mid2W) scrollingMidTwo = 0;
+    if (scrollingFore <= -foreW) scrollingFore = 0;
+
+    // Draw all layers
+    DrawTextureEx(background, (Vector2){ scrollingBack, 0 }, 0.0f, layerScale, WHITE);
+    DrawTextureEx(background, (Vector2){ backW + scrollingBack, 0 }, 0.0f, layerScale, WHITE);
+
+    DrawTextureEx(midgroundOne, (Vector2){ scrollingMidOne, 0 }, 0.0f, layerScale, WHITE);
+    DrawTextureEx(midgroundOne, (Vector2){ mid1W + scrollingMidOne, 0 }, 0.0f, layerScale, WHITE);
+
+    DrawTextureEx(midgroundTwo, (Vector2){ scrollingMidTwo, 0 }, 0.0f, layerScale, WHITE);
+    DrawTextureEx(midgroundTwo, (Vector2){ mid2W + scrollingMidTwo, 0 }, 0.0f, layerScale, WHITE);
+
+    DrawTextureEx(foreground, (Vector2){ scrollingFore, 0 }, 0.0f, layerScale, WHITE);
+    DrawTextureEx(foreground, (Vector2){ foreW + scrollingFore, 0 }, 0.0f, layerScale, WHITE);
 }
