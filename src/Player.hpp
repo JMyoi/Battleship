@@ -15,6 +15,8 @@ class Player{
         bool drawTrackingBoard(ShotResult& res); //called during the opponents turn to display everything except where the ships are, handles fire and returns true if hit or miss so game can change state
         bool checkGameOver(); // returns true if all ships are sunk
         void placeShipsRandomly(); // AI setup: randomly places all ships on the board with legal placement
+        void startReceivingFire(int row, int col, ShotResult& result); // AI fires at this player — fires board, registers hit on ship, starts animation
+        bool drawBoardAITurn(); // draws own board during AI turn with animations; returns true when animation finishes
 
         
     private:

@@ -105,6 +105,12 @@ int main(void)
                             screenHeight);
                     game.drawP2Turn();
                     break;
+                case GameState::AITurn:
+                    DrawParallaxBackground(P1background, P1midgroundOne, P1midgroundTwo, P1foreground,
+                           scrollingBack, scrollingMidOne, scrollingMidTwo, scrollingFore,
+                           screenHeight);
+                    game.drawAITurn();
+                    break;
                 case GameState::GameOver:
                         DrawParallaxBackground(GGbackground, GGmidgroundOne, GGmidgroundTwo, GGforeground,
                             scrollingBack, scrollingMidOne, scrollingMidTwo, scrollingFore,

@@ -204,6 +204,49 @@ void Player::placeShipsRandomly(){
     }
 }
 
+void Player::startReceivingFire(int row, int col, ShotResult& result){
+    position at;
+    playerBoard.FireAt(row, col, result, at);
+    if(result == ShotResult::Hit){
+        for(Ship& ship: ships){
+            if(ship.matchingAt(at)){
+                ship.shipHitAt(at);
+                if(ship.isSunk()) ship.playAce();
+                break;
+            }
+        }
+    }
+    shotPendingTransition = true;
+    pendingShotResult = result;
+}
+
+bool Player::drawBoardAITurn(){
+    Vector2 start = {50, 100};
+    playerBoard.Draw(start);
+    drawShipsonBoard();
+    playerBoard.UpdateAnimations();
+    playerBoard.DrawHitsAndMiss(start);
+    playerBoard.DrawExplosion();
+    playerBoard.DrawMissSplashAnimation();
+
+    int sunkCount = 0;
+    for(Ship& ship: ships){
+        if(ship.isSunk()) sunkCount++;
+    }
+    string sunkText = to_string(sunkCount) + "/" + to_string(ships.size()) + " Ships Sunk";
+    float bottomOfGrid = start.y + 10 * 50;
+    DrawText(sunkText.c_str(), (GetScreenWidth()/4 - MeasureText(sunkText.c_str(), 25)/2), (int)(bottomOfGrid + 45), 25, BLACK);
+
+    if(shotPendingTransition){
+        if(!playerBoard.IsShotAnimationActive()){
+            shotPendingTransition = false;
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
 bool Player::checkGameOver(){
     //check if all ships are sunk
     bool allSunk = true;// assume true first

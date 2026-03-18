@@ -312,6 +312,34 @@ bool Board::PlaceShipAt(int row, int col, int shipSize, vector<position>& newPos
     return true;
 }
 
+// Fires at a specific (row, col) without requiring a mouse click. Used by AI turn.
+bool Board::FireAt(int row, int col, ShotResult& result, position& at){
+    TileState thisTileState = grid.at(row).at(col).state;
+    switch(thisTileState){
+        case TileState::Empty:
+            grid.at(row).at(col).state = TileState::Miss;
+            result = ShotResult::Miss;
+            at.row = row; at.col = col; at.hit = false;
+            PlaySound(MissSplash);
+            StartMissSplashAtTile(row, col);
+            return true;
+        case TileState::Ship:
+            grid.at(row).at(col).state = TileState::Hit;
+            result = ShotResult::Hit;
+            at.row = row; at.col = col; at.hit = true;
+            PlaySound(HitBoom);
+            PlaySound(HitBoom);
+            StartExplosionAtTile(row, col);
+            return true;
+        case TileState::Hit:
+        case TileState::Miss:
+            result = ShotResult::AlreadyFired;
+            at.row = row; at.col = col; at.hit = true;
+            return true;
+    }
+    return false;
+}
+
 /* Trackingboard funciton calls this funciton,
 should return true only if a tile is clicked
 false otherwise

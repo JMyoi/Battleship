@@ -37,6 +37,7 @@ class Board{
         bool HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction,string& ErrorMessage); // returns true if the ship is placed and false if not.
         bool PlaceShipAt(int row, int col, int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage); // position-based placement (no click), used by AI
         bool HandleFire(ShotResult& result, position& at); // checks for a click on board and tries to verify hit or miss.
+        bool FireAt(int row, int col, ShotResult& result, position& at); // programmatic fire (no click), used for AI turn
         //animation related funcitons
         void UpdateAnimations();
         void DrawExplosion();

@@ -12,7 +12,7 @@ int selectedMode = -1;       // 0 = 1v1 Local,  1 = vs AI
 int selectedDifficulty = -1; // 0 = Easy,  1 = Medium,  2 = Hard  (only used when selectedMode == 1)
 
 //constructor
-Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired}, aiShotPending(false), aiLastShot{0,0} {}
 
 GameState Game::getGameState(){
     return state;
@@ -100,6 +100,8 @@ void Game::drawMenu() {
         state = GameState::SetupP1;
         player1 = Player(NoOfShips);
         player2 = Player(NoOfShips);
+        aiShotPending = false;
+        aiFiredAt.clear();
     }
 }
 
@@ -210,7 +212,7 @@ void Game::drawP1Turn(){
         if (player2.checkGameOver()) {
             state = GameState::GameOver;
         } else {
-            state = GameState::P2Transition;
+            state = (gameMode == GameMode::LocalPvP) ? GameState::P2Transition : GameState::AITurn;
         }
     }
 }
@@ -245,16 +247,57 @@ void Game::drawGameOver(){
     DrawText(text, centerX - MeasureText(text, 50) / 2, centerY - 100, 50, WHITE);
     //display who wins
     if(player1.checkGameOver()){
-        const char* winner = "player 2 Wins";
+        const char* winner = (gameMode == GameMode::LocalPvP) ? "Player 2 Wins" : "AI Wins";
         DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
     else{
-        const char* winner = "player 1 Wins";
+        const char* winner = "Player 1 Wins";
         DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
 }
 
 
+
+// Returns a random (row, col) the AI hasn't fired at yet.
+pair<int,int> Game::computeAIShot(){
+    int row, col;
+    do {
+        row = GetRandomValue(0, 9);
+        col = GetRandomValue(0, 9);
+    } while(aiFiredAt.count({row, col}) > 0);
+    return {row, col};
+}
+
+void Game::drawAITurn(){
+    // Fire exactly once when we first enter this state
+    if(!aiShotPending){
+        aiLastShot = computeAIShot();
+        aiFiredAt.insert(aiLastShot);
+        ShotResult result;
+        player1.startReceivingFire(aiLastShot.first, aiLastShot.second, result);
+        aiShotPending = true;
+    }
+
+    // Labels
+    const char* header = "Enemy Turn";
+    DrawText(header, GetScreenWidth() / 2 - MeasureText(header, 30) / 2, 10, 30, BLACK);
+    const char* boardLabel = "My Board";
+    DrawText(boardLabel, GetScreenWidth()/4 - MeasureText(boardLabel, 25)/2, 70, 25, BLACK);
+
+    // Show where the AI fired
+    const char* fireMsg = TextFormat("Enemy fires at %c%d!", (char)('A' + aiLastShot.second), aiLastShot.first + 1);
+    DrawText(fireMsg, GetScreenWidth()/2 - MeasureText(fireMsg, 22)/2, 680, 22, RED);
+
+    // Draw player 1's board with the incoming hit animation
+    if(player1.drawBoardAITurn()){
+        aiShotPending = false;
+        if(player1.checkGameOver()){
+            state = GameState::GameOver;
+        } else {
+            state = GameState::P1Transition;
+        }
+    }
+}
 
 //private helper functions.
 
