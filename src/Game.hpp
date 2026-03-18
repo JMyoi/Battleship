@@ -6,11 +6,13 @@
 using namespace std;
 
 
-enum class GameState { Menu, 
+enum class GameState { Menu,
     SetupP1, P2SetupTransition, SetupP2,
     P1Transition, P2Transition,
-    TurnP1, TurnP2, 
+    TurnP1, TurnP2,
     GameOver };
+
+enum class GameMode { LocalPvP, AIEasy, AIMedium, AIHard };
 
 class Game{
     public:
@@ -31,14 +33,15 @@ class Game{
         Player player1;
         Player player2;
         GameState state;
+        GameMode gameMode;
         int NoOfShips;
-        // keeps track and displays the players result after each fire,(Did they hit or miss?) 
-        //if it's the first turn there will be no firing history and state will 
+        // keeps track and displays the players result after each fire,(Did they hit or miss?)
+        //if it's the first turn there will be no firing history and state will
         //be AlreadyFired to indicate that, assigned by constructor
         ShotResult CurrResult;
 
-        //helper private funciton for menu
-        void getSelectedOption(vector<Rectangle>& options);
+        //helper private function for menu — writes clicked index into `selected`
+        void getSelectedOption(vector<Rectangle>& options, int& selected);
 
         
 

@@ -21,6 +21,7 @@ class Ship{
         void drawShipHorizontal(Vector2 newPos);
         void draw(); // draw the ship that has a position set from placement. 
         void drawSunken();
+        int getSize() const;
         bool shipClicked();
         bool isPlaced();
         void shipHitAt(position pos);

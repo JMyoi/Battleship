@@ -35,6 +35,7 @@ class Board{
         void Draw(Vector2 start); 
         void DrawHitsAndMiss(Vector2 start); // because the ship renders over the hits form Draw(), we need a separate funciton to call after the ships are rendered.
         bool HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction,string& ErrorMessage); // returns true if the ship is placed and false if not.
+        bool PlaceShipAt(int row, int col, int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage); // position-based placement (no click), used by AI
         bool HandleFire(ShotResult& result, position& at); // checks for a click on board and tries to verify hit or miss.
         //animation related funcitons
         void UpdateAnimations();

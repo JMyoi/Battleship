@@ -186,6 +186,24 @@ bool Player::drawTrackingBoard(ShotResult& res){
     
 }
 
+void Player::placeShipsRandomly(){
+    for(int i = 0; i < (int)ships.size(); i++){
+        int shipSize = ships.at(i).getSize();
+        string errMsg;
+        bool placed = false;
+        while(!placed){
+            Direction dir = (GetRandomValue(0, 1) == 0) ? Direction::Vertical : Direction::Horizontal;
+            int row = GetRandomValue(0, 9);
+            int col = GetRandomValue(0, 9);
+            vector<position> newPositions(shipSize);
+            if(playerBoard.PlaceShipAt(row, col, shipSize, newPositions, dir, errMsg)){
+                ships.at(i).setShip(newPositions);
+                placed = true;
+            }
+        }
+    }
+}
+
 bool Player::checkGameOver(){
     //check if all ships are sunk
     bool allSunk = true;// assume true first

@@ -67,6 +67,8 @@ Ship::Ship(int size){
 
 }
 
+int Ship::getSize() const { return size; }
+
 // draws ship for setup phase vertical version
 void Ship::drawShip(Vector2 newPos){
     // make ship rectangle vertical, in case it was horizontal and switches back

@@ -14,6 +14,7 @@ class Player{
         void drawBoard(); // after setup phase board will display during players turn, should display ships, hits, misses, sunken ships, etc.
         bool drawTrackingBoard(ShotResult& res); //called during the opponents turn to display everything except where the ships are, handles fire and returns true if hit or miss so game can change state
         bool checkGameOver(); // returns true if all ships are sunk
+        void placeShipsRandomly(); // AI setup: randomly places all ships on the board with legal placement
 
         
     private:

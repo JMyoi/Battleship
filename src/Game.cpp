@@ -6,11 +6,13 @@
 #include <iostream>
 using namespace std;
 
-// global variable for main menu Number of ship selection, -1 means no option selected
-int selectedOption = -1; 
+// global variables for main menu selections, -1 means nothing selected yet
+int selectedOption = -1;     // 0-4  → ship count (1-5)
+int selectedMode = -1;       // 0 = 1v1 Local,  1 = vs AI
+int selectedDifficulty = -1; // 0 = Easy,  1 = Medium,  2 = Hard  (only used when selectedMode == 1)
 
 //constructor
-Game::Game() : player1(1), player2(1), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
 
 GameState Game::getGameState(){
     return state;
@@ -18,46 +20,87 @@ GameState Game::getGameState(){
 
 void Game::drawMenu() {
     Vector2 mousePos = GetMousePosition();
-    int centerX = GetScreenWidth() / 2; // used to center text
+    int centerX = GetScreenWidth() / 2;
 
-    char title[] = "Battleship";
-    DrawText(title, centerX - MeasureText(title, 50) / 2, 100, 50, BLACK);
-    char shipSelectionText[] = "Select number of ships";
-    DrawText(shipSelectionText, centerX - MeasureText(shipSelectionText, 30) / 2, 230, 30, BLACK);
+    // --- Title ---
+    const char* title = "Battleship";
+    DrawText(title, centerX - MeasureText(title, 50) / 2, 70, 50, BLACK);
 
-    // Create 5 rectangle options for number of ships
-    // 5 boxes of 50px wide, 10px gap = total width 290px
-    vector<Rectangle> options(5);
-    options.at(0) = {(float)(centerX - 145), 310, 50, 50};
-    for(int i = 1; i<5; i++){ //spacing ships out vertically
-        options.at(i) = {options.at(i-1).x + 60, 310, 50, 50};
+    // --- Ship count row ---
+    const char* shipText = "Select number of ships";
+    DrawText(shipText, centerX - MeasureText(shipText, 25) / 2, 150, 25, BLACK);
+
+    // 5 buttons: 50px wide, 60px apart, total span 290px, centered
+    vector<Rectangle> shipOptions(5);
+    shipOptions[0] = {(float)(centerX - 145), 185, 50, 45};
+    for (int i = 1; i < 5; i++)
+        shipOptions[i] = {shipOptions[i-1].x + 60, 185, 50, 45};
+
+    getSelectedOption(shipOptions, selectedOption);
+    for (int i = 0; i < 5; i++) {
+        DrawRectangleRec(shipOptions[i], selectedOption == i ? GRAY : LIGHTGRAY);
+        DrawText(to_string(i+1).c_str(), shipOptions[i].x + 15, shipOptions[i].y + 12, 20, BLACK);
     }
-    // get and handle number of ship clicked and updates the global variable
-    getSelectedOption(options);
-    // draw the rectangles and text.
-    for(int i = 0; i<5; i++){
-        if(selectedOption == i){
-            DrawRectangleRec(options.at(i), GRAY);
+
+    // --- Game mode row ---
+    const char* modeText = "Select Game Mode";
+    DrawText(modeText, centerX - MeasureText(modeText, 25) / 2, 255, 25, BLACK);
+
+    // [1v1 Local] 120px, gap 20px, [vs AI] 120px — total 260px centered
+    vector<Rectangle> modeOptions(2);
+    modeOptions[0] = {(float)(centerX - 130), 290, 120, 45}; // 1v1 Local
+    modeOptions[1] = {(float)(centerX +  10), 290, 120, 45}; // vs AI
+
+    getSelectedOption(modeOptions, selectedMode);
+    DrawRectangleRec(modeOptions[0], selectedMode == 0 ? GRAY : LIGHTGRAY);
+    DrawText("1v1 Local", modeOptions[0].x + 10, modeOptions[0].y + 12, 20, BLACK);
+    DrawRectangleRec(modeOptions[1], selectedMode == 1 ? GRAY : LIGHTGRAY);
+    DrawText("vs AI",     modeOptions[1].x + 30, modeOptions[1].y + 12, 20, BLACK);
+
+    // --- Difficulty row (always drawn; disabled/greyed when 1v1 is selected) ---
+    bool aiMode = (selectedMode == 1);
+    const char* diffLabel = "Select Difficulty";
+    DrawText(diffLabel, centerX - MeasureText(diffLabel, 20) / 2, 360, 20, aiMode ? BLACK : GRAY);
+
+    // [Easy] [Medium] [Hard] — 90px each, 10px gap, total 290px centered
+    vector<Rectangle> diffOptions(3);
+    diffOptions[0] = {(float)(centerX - 145), 385, 90, 45}; // Easy
+    diffOptions[1] = {(float)(centerX -  45), 385, 90, 45}; // Medium
+    diffOptions[2] = {(float)(centerX +  55), 385, 90, 45}; // Hard
+
+    if (aiMode) getSelectedOption(diffOptions, selectedDifficulty);
+
+    for (int i = 0; i < 3; i++) {
+        Color bg = !aiMode ? Fade(LIGHTGRAY, 0.5f)
+                           : (selectedDifficulty == i ? GRAY : LIGHTGRAY);
+        DrawRectangleRec(diffOptions[i], bg);
+    }
+    DrawText("Easy",   diffOptions[0].x + 20, diffOptions[0].y + 12, 20, aiMode ? BLACK : GRAY);
+    DrawText("Medium", diffOptions[1].x +  8, diffOptions[1].y + 12, 20, aiMode ? BLACK : GRAY);
+    DrawText("Hard",   diffOptions[2].x + 20, diffOptions[2].y + 12, 20, aiMode ? BLACK : GRAY);
+
+    // --- Start button ---
+    // Active only when ship count, mode, and (if AI) difficulty are all chosen
+    bool canStart = selectedOption != -1 && selectedMode != -1 &&
+                    (!aiMode || selectedDifficulty != -1);
+
+    Rectangle startButton = {(float)(centerX - 50), 460, 100, 50};
+    DrawRectangleRec(startButton, canStart ? LIGHTGRAY : Fade(LIGHTGRAY, 0.4f));
+    DrawText("Start", startButton.x + 20, startButton.y + 15, 20, canStart ? BLACK : GRAY);
+
+    if (canStart && CheckCollisionPointRec(mousePos, startButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
+        NoOfShips = selectedOption + 1;
+        if (selectedMode == 0) {
+            gameMode = GameMode::LocalPvP;
         } else {
-            DrawRectangleRec(options.at(i), LIGHTGRAY);
+            if      (selectedDifficulty == 0) gameMode = GameMode::AIEasy;
+            else if (selectedDifficulty == 1) gameMode = GameMode::AIMedium;
+            else                              gameMode = GameMode::AIHard;
         }
-        DrawText(to_string(i+1).c_str(), options.at(i).x + 15, options.at(i).y + 15, 20, BLACK);
+        state = GameState::SetupP1;
+        player1 = Player(NoOfShips);
+        player2 = Player(NoOfShips);
     }
-    // start button
-    Rectangle startButton = {(float)(centerX - 50), 410, 100, 50};
-    DrawRectangleRec(startButton, LIGHTGRAY);
-    DrawText("Start", startButton.x + 20, startButton.y + 15, 20, BLACK);
-    
-    // handle start game click will change state to setup and pass NoOfShips to players
-    if(CheckCollisionPointRec(mousePos, startButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        if(selectedOption != -1){
-            NoOfShips = selectedOption + 1;
-            state = GameState::SetupP1;
-            player1 = Player(NoOfShips);
-            player2 = Player(NoOfShips);
-        }
-    }
-    
 }
 
 
@@ -66,9 +109,13 @@ void Game::drawMenu() {
 void Game::drawP1Setup(){// draw player 1 setup screen
     const char* p1text = "Player 1, place your ships";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
-    // should update state after the player puts a ship on board.
     if(player1.drawSetupBoard()){
-        state = GameState::P2SetupTransition;
+        if(gameMode == GameMode::LocalPvP){
+            state = GameState::P2SetupTransition; // human P2 setup as normal
+        } else {
+            player2.placeShipsRandomly();          // AI instantly places ships
+            state = GameState::P1Transition;       // skip P2 setup entirely
+        }
     }
 }
 
@@ -211,14 +258,13 @@ void Game::drawGameOver(){
 
 //private helper functions.
 
-//updates selectedOption global with the index of the clicked ship count option.
-void Game::getSelectedOption(vector<Rectangle>& options){
+// writes the index of the clicked rectangle into `selected`
+void Game::getSelectedOption(vector<Rectangle>& options, int& selected){
     Vector2 mousePos = GetMousePosition();
     if(IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        for(int i = 0; i < options.size(); i++){
+        for(int i = 0; i < (int)options.size(); i++){
             if(CheckCollisionPointRec(mousePos, options.at(i))){
-                //update the global variable to keep track of which one has been clicked
-                selectedOption = i;
+                selected = i;
             }
         }
     }

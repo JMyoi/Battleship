@@ -268,6 +268,50 @@ void Board::DrawHitsAndMiss(Vector2 start){
     }
 }
 
+// Position-based ship placement — same validation logic as HandlePlaceShip but no mouse click.
+// Used by AI to place ships programmatically.
+bool Board::PlaceShipAt(int row, int col, int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage){
+    if(grid.at(row).at(col).state != TileState::Empty){
+        ErrorMessage = "Cannot place, ship already there.";
+        return false;
+    }
+    int currRow = row, currCol = col;
+    if(direction == Direction::Vertical){
+        for(int i = 0; i < shipSize - 1; i++){
+            currRow++;
+            if(currRow >= 10 || grid.at(currRow).at(col).state != TileState::Empty){
+                ErrorMessage = "Cannot place, either out of bound or ship already there";
+                return false;
+            }
+        }
+        currRow = row;
+        for(int i = 0; i < shipSize; i++){
+            grid.at(currRow).at(col).state = TileState::Ship;
+            newPositions.at(i).row = currRow;
+            newPositions.at(i).col = col;
+            newPositions.at(i).hit = false;
+            currRow++;
+        }
+    } else { // Horizontal
+        for(int i = 0; i < shipSize - 1; i++){
+            currCol++;
+            if(currCol >= 10 || grid.at(row).at(currCol).state != TileState::Empty){
+                ErrorMessage = "Cannot place, either out of bound or ship already there";
+                return false;
+            }
+        }
+        currCol = col;
+        for(int i = 0; i < shipSize; i++){
+            grid.at(row).at(currCol).state = TileState::Ship;
+            newPositions.at(i).row = row;
+            newPositions.at(i).col = currCol;
+            newPositions.at(i).hit = false;
+            currCol++;
+        }
+    }
+    return true;
+}
+
 /* Trackingboard funciton calls this funciton,
 should return true only if a tile is clicked
 false otherwise
