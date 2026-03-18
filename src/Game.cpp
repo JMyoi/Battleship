@@ -10,7 +10,7 @@ using namespace std;
 int selectedOption = -1; 
 
 //constructor
-Game::Game() : player1(5), player2(5), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired} {}
 
 GameState Game::getGameState(){
     return state;
@@ -18,7 +18,7 @@ GameState Game::getGameState(){
 
 void Game::drawMenu() {
     Vector2 mousePos = GetMousePosition();
-    int centerX = GetScreenWidth() / 2;
+    int centerX = GetScreenWidth() / 2; // used to center text
 
     char title[] = "Battleship";
     DrawText(title, centerX - MeasureText(title, 50) / 2, 100, 50, BLACK);
@@ -29,11 +29,11 @@ void Game::drawMenu() {
     // 5 boxes of 50px wide, 10px gap = total width 290px
     vector<Rectangle> options(5);
     options.at(0) = {(float)(centerX - 145), 310, 50, 50};
-    for(int i = 1; i<5; i++){
+    for(int i = 1; i<5; i++){ //spacing ships out vertically
         options.at(i) = {options.at(i-1).x + 60, 310, 50, 50};
     }
-    // get and handle number of ships selected
-    int selectedOption = getSelectedOption(options);
+    // get and handle number of ship clicked and updates the global variable
+    getSelectedOption(options);
     // draw the rectangles and text.
     for(int i = 0; i<5; i++){
         if(selectedOption == i){
@@ -43,7 +43,6 @@ void Game::drawMenu() {
         }
         DrawText(to_string(i+1).c_str(), options.at(i).x + 15, options.at(i).y + 15, 20, BLACK);
     }
-
     // start button
     Rectangle startButton = {(float)(centerX - 50), 410, 100, 50};
     DrawRectangleRec(startButton, LIGHTGRAY);
@@ -64,8 +63,7 @@ void Game::drawMenu() {
 
 
 
-void Game::drawP1Setup(){
-    // draw player 1 setup screen
+void Game::drawP1Setup(){// draw player 1 setup screen
     const char* p1text = "Player 1, place your ships";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     // should update state after the player puts a ship on board.
@@ -106,7 +104,7 @@ void Game::drawP1Transition(){
         DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
         break;
     case ShotResult::AlreadyFired:
-        //do nothing
+        //do nothing, this case happens for the first turn only, 
         break;   
      }
     const char* text = "Player 1 Ready?";
@@ -117,11 +115,7 @@ void Game::drawP1Transition(){
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to player 1 Turn or game over .
     if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    if (player1.checkGameOver()) {   // Player 2 has no remaining ships. Record Player 1 as the winner and transition to GameOver.
-        state = GameState::GameOver;
-    } else {
         state = GameState::TurnP1;
-    }
     }
 }
 
@@ -146,11 +140,7 @@ void Game::drawP2Transition(){
     DrawText("Ready", ReadyButton.x + 20, ReadyButton.y + 15, 20, BLACK);
     //handle ready click and change state to set up player 2 Turn or game over.
     if (CheckCollisionPointRec(GetMousePosition(), ReadyButton) && IsMouseButtonDown(MOUSE_LEFT_BUTTON)) {
-    if (player2.checkGameOver()) {   // Player 1 has no remaining ships. Record Player 2 as the winner and transition to GameOver.
-        state = GameState::GameOver;
-    } else {
         state = GameState::TurnP2;
-    }
     }
 }
 
@@ -164,18 +154,18 @@ void Game::drawP1Turn(){
     // render the players board and it's ships, along with hits, misses, sunken ships.
     player1.drawBoard();
     // render tracking board with info about other players board.
-    // handle click on tracking board in this trakcing board funciton.
+    // handle click on tracking board, if it is clicked it will result in true and log the result
     ShotResult result;
-    if (player2.drawTrackingBoard(result)) {
-    CurrResult = result;
-    // Immediately check if Player 2 has lost after Player 1 fires.
-    // If all of Player 2's ships are sunk, transition directly to GameOver
-    if (player2.checkGameOver()) {
-        state = GameState::GameOver;
-    } else {
-        state = GameState::P2Transition;
+    if (player2.drawTrackingBoard(result)) {//if the player made a shot then it will be true and we log if it is a hit or miss, go to the next game state
+        CurrResult = result;
+        // Immediately check if Player 2 has lost after Player 1 fires.
+        // If all of Player 2's ships are sunk, transition directly to GameOver
+        if (player2.checkGameOver()) {
+            state = GameState::GameOver;
+        } else {
+            state = GameState::P2Transition;
+        }
     }
-}
 }
 
 void Game::drawP2Turn(){
@@ -203,14 +193,17 @@ void Game::drawP2Turn(){
 
 void Game::drawGameOver(){
     const char* text = "GameOver";
-    DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 10, 30, BLACK);
+    int centerX = GetScreenWidth() / 2;
+    int centerY = GetScreenHeight() / 2;
+    DrawText(text, centerX - MeasureText(text, 50) / 2, centerY - 100, 50, WHITE);
     //display who wins
     if(player1.checkGameOver()){
-        DrawText("player 2 Wins", GetScreenWidth() / 2 - MeasureText("player 2 Wins", 30) / 2, 100, 30, BLACK);
+        const char* winner = "player 2 Wins";
+        DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
     else{
-        DrawText("player 1 Wins", GetScreenWidth() / 2 - MeasureText("player 1 Wins", 30) / 2, 100, 30, BLACK);
-
+        const char* winner = "player 1 Wins";
+        DrawText(winner, centerX - MeasureText(winner, 50) / 2, centerY + 50, 50, WHITE);
     }
 }
 
@@ -218,18 +211,15 @@ void Game::drawGameOver(){
 
 //private helper functions.
 
-
-//handles for user click on number of ship option and returns what the user has clicked, 1-5.
-int Game::getSelectedOption(vector<Rectangle>& options){
+//updates selectedOption global with the index of the clicked ship count option.
+void Game::getSelectedOption(vector<Rectangle>& options){
     Vector2 mousePos = GetMousePosition();
     if(IsMouseButtonDown(MOUSE_LEFT_BUTTON)){
-        for(int i = 0; i < 5; i++){
+        for(int i = 0; i < options.size(); i++){
             if(CheckCollisionPointRec(mousePos, options.at(i))){
-                // instead of a global variable could we just use our private data member NoOfShips?
+                //update the global variable to keep track of which one has been clicked
                 selectedOption = i;
-                return selectedOption;
             }
         }
     }
-    return selectedOption;
 }

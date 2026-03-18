@@ -13,13 +13,20 @@ class Tile{
         // data members
         Rectangle rect; // has x, y, width, height
         TileState state;
-        Texture impact; // used to indicate hit
-        Texture missSplash;//used to indicate miss
         // member funcitons
         Tile();
         void Draw();
         void drawHitsAndMiss();// called by Board::DrawHitAndMiss()
         bool isClicked();
+
+        // shared tile markers loaded once for all tiles
+        static void LoadSharedTexturesOnce();
+        static void UnloadSharedTextures();
+
+    private:
+        static bool sTexturesLoaded;
+        static Texture2D sImpact;
+        static Texture2D sMissSplash;
 };
 
 class Board{
@@ -35,8 +42,9 @@ class Board{
         void DrawMissSplashAnimation();
         bool IsShotAnimationActive() const;
     private:
-        vector<vector<Tile>> grid; // 2D grid of tiles
-        Texture2D Ocean;
+        vector<vector<Tile>> grid; // 10 X 10 2D grid of tiles
+
+        Texture2D Ocean; // board background
         //animation related members
         Texture2D Explosion;
         Vector2 explosionPosition;
@@ -44,7 +52,7 @@ class Board{
         int explosionCurrentFrame;
         int explosionFrameCounter;
         int explosionFramesSpeed;
-        int explosionFrameCount; 
+        int explosionFrameCount;
         bool explosionActive;
 
         Texture2D MissSplashAnimation;
@@ -56,6 +64,10 @@ class Board{
         int missSplashFramesSpeed;
         int missSplashFrameCount;
         bool missSplashActive;
+
+        //firing Sounds for miss and hit
+        Sound HitBoom;
+        Sound MissSplash; // need to shorten beggining? or time animation slower?
 
         void StartExplosionAtTile(int row, int col);
         void StartMissSplashAtTile(int row, int col);

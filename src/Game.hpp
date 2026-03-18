@@ -32,10 +32,13 @@ class Game{
         Player player2;
         GameState state;
         int NoOfShips;
-        ShotResult CurrResult;// keeps track and displays the players result after each fire, it's the first turn there will be no firing history and state will be AlreadyFired to indicate that, assigned by constructor
+        // keeps track and displays the players result after each fire,(Did they hit or miss?) 
+        //if it's the first turn there will be no firing history and state will 
+        //be AlreadyFired to indicate that, assigned by constructor
+        ShotResult CurrResult;
 
-
-        int getSelectedOption(vector<Rectangle>& options);
+        //helper private funciton for menu
+        void getSelectedOption(vector<Rectangle>& options);
 
         
 

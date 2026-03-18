@@ -5,32 +5,45 @@
 #include <iostream>
 using namespace std;
 
+bool Tile::sTexturesLoaded = false;
+Texture2D Tile::sImpact = {};
+Texture2D Tile::sMissSplash = {};
+//for images that need to be cropped 
+static Texture2D LoadCropped(const char* path, Rectangle crop, int w, int h) {
+    Image img = LoadImage(path);
+    ImageCrop(&img, crop);
+    ImageResize(&img, w, h);
+    Texture2D tex = LoadTextureFromImage(img);
+    UnloadImage(img);
+    return tex;
+}
+void Tile::LoadSharedTexturesOnce() {
+    if (sTexturesLoaded) return;
+
+    sImpact = LoadCropped("src/assets/Poof.png", {300, 80, 170, 170}, 50, 50);
+    sMissSplash = LoadCropped("src/assets/drip.png", {570, 400, 340, 270}, 50, 50);
+    sTexturesLoaded = true;
+}
+
+void Tile::UnloadSharedTextures() {
+    if (!sTexturesLoaded) return;
+
+    UnloadTexture(sImpact);
+    UnloadTexture(sMissSplash);
+    sImpact = {};
+    sMissSplash = {};
+    sTexturesLoaded = false;
+}
+// ===== End shared textures =====
+
 //Tile Implementation
 
 Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
 
-    // crop the top right corner from poof.png
-    Image img = LoadImage("src/assets/Poof.png");
-    //width 2000, height 1400
-    float h = static_cast<float>(img.height/3); 
-    float w = static_cast<float>(img.width/3); 
-    Rectangle crop = {0, 0, w, h};
-    ImageCrop(&img, crop);
-    crop = {300, 80, 170, 170}; // values deduced using tiral and error
-    ImageCrop(&img, crop);
-    ImageResize(&img,50,50);
-    impact = LoadTextureFromImage(img);     
-
-    //load the miss splash
-    img = LoadImage("src/assets/drip.png");
-    crop = {570, 400,340,270}; // values deduced using tiral and error
-    ImageCrop(&img, crop);
-    ImageResize(&img,50,50);
-    missSplash = LoadTextureFromImage(img);  
+    LoadSharedTexturesOnce();
     
-
 }
 
 
@@ -40,32 +53,21 @@ void Tile::Draw(){
 
 
 void Tile::drawHitsAndMiss(){
-    int centerX = rect.x + 25; // height and width is default 50, 50/2 = 25.
-    int centerY = rect.y + 25;
-    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
-    // based on the state, display different color, red for hit, blue for miss, nothing for miss.
-    switch (state)
-    {
-    case TileState::Hit:{
-       //DrawCircle(centerX, centerY, 10, RED);
-       DrawTextureV(impact, {rect.x, rect.y}, WHITE);
-        break;
+    // based on the state, display different sprites, impact for hit, drip for miss, nothing for miss.
+    switch (state){
+        case TileState::Hit:{
+            DrawTextureV(sImpact, {rect.x, rect.y}, WHITE);
+                break;
+        }
+        case TileState::Miss:{
+            DrawTextureV(sMissSplash, {rect.x, rect.y}, WHITE);
+            break;
+        }
+        case TileState::Empty:
+        case TileState::Ship:
+            break;
     }
-    case TileState::Miss:{
-        DrawCircle(centerX, centerY, 10, BLUE);
-        DrawTextureV(missSplash, {rect.x, rect.y}, WHITE);
-        //render the drip
-         break;
-    }
-    case TileState::Empty:
-    case TileState::Ship:
-        break;
-    }
-
-
 }
-
-
 
 
 bool Tile::isClicked(){
@@ -100,9 +102,9 @@ Board::Board(){
     static_cast<float>(Explosion.height)};
     explosionCurrentFrame = 0;
     explosionFrameCounter = 0;
-    explosionFramesSpeed = 8;
+    explosionFramesSpeed = 10;
     explosionActive = false;
-
+        //load miss splash 
     MissSplashAnimation = LoadTexture("src/assets/poofDrip.png");
     SetTextureFilter(MissSplashAnimation, TEXTURE_FILTER_POINT);
     missSplashFrameCount = 6;
@@ -116,8 +118,12 @@ Board::Board(){
     missSplashPosition = {0, 0};
     missSplashCurrentFrame = 0;
     missSplashFrameCounter = 0;
-    missSplashFramesSpeed = 12;
+    missSplashFramesSpeed = 14;
     missSplashActive = false;
+
+    //Load sounds
+    MissSplash = LoadSound("src/assets/missSplash.mp3");
+    HitBoom = LoadSound("src/assets/HitExplosion.mp3");
 }
 
 void Board::UpdateAnimations(){
@@ -209,8 +215,6 @@ void Board::StartMissSplashAtTile(int row, int col){
 void Board::Draw(Vector2 start){
     //background ocean
     DrawTextureV(Ocean,start,WHITE);
-    //background ocean
-    DrawTextureV(Ocean,start,WHITE);
     float TileWidth = 50; // board width / 10 = 500 / 10 = 50
     float TileHeight = 50; // 50
     float TileX = start.x;  
@@ -254,6 +258,7 @@ void Board::Draw(Vector2 start){
         }
 
 }
+
 void Board::DrawHitsAndMiss(Vector2 start){
     // assign all tiles appropriate width, height,  and position 
         for(int row = 0; row<10; row++){
@@ -287,6 +292,8 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = false;
+                    //play miss fire sound
+                    PlaySound(MissSplash);
                     StartMissSplashAtTile(row, col);
                     return true;
                     break;
@@ -296,6 +303,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = true;
+                    PlaySound(HitBoom);
                     StartExplosionAtTile(row, col);
                     return true;
                     break;
