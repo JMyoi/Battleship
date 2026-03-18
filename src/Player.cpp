@@ -42,10 +42,6 @@ bool Player::drawSetupBoard(){
             }
         }
     }
-<<<<<<< HEAD
-=======
-
->>>>>>> 84d336267acdbbbc6005e0daf12f0fdbf3fe35be
     //Display r to rotate text
     char RotateText[] = "Press R to Rotate";
     DrawText(RotateText, (GetScreenWidth()/2 + 50), 500, 25, BLACK);
@@ -124,11 +120,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
     playerBoard.Draw(start);
     playerBoard.UpdateAnimations();
 
-<<<<<<< HEAD
     //draw the sunken ships on tracking board and also the ratio of sunken ships.
-=======
-    //draw how much ships are sunk
->>>>>>> 84d336267acdbbbc6005e0daf12f0fdbf3fe35be
     int sunkCount = 0;
     for(Ship& ship: ships){
         if(ship.isSunk()){
@@ -176,25 +168,13 @@ bool Player::drawTrackingBoard(ShotResult& res){
                 }
             }
             pendingShotResult = result;
-            shotPendingTransition = true;
-            if(!playerBoard.IsShotAnimationActive()){
-                res = pendingShotResult;
-                shotPendingTransition = false;
-                pendingShotResult = ShotResult::AlreadyFired;
-                return true; // to change to next game state when the explosion animation is done.
-            }
-            return false; // to not transition to next game state and wait till animation is done.
+            shotPendingTransition = true;  
+            return false; // pending gate above resolves transition when animation finishes.
         }
         else if(result == ShotResult::Miss){
             cout<<"You've Missed at: "<<pos.row<<", "<<pos.col<<endl;
             pendingShotResult = result;
             shotPendingTransition = true;
-            if(!playerBoard.IsShotAnimationActive()){
-                res = pendingShotResult;
-                shotPendingTransition = false;
-                pendingShotResult = ShotResult::AlreadyFired;
-                return true;
-            }
             return false;
         } 
         else if(result == ShotResult::AlreadyFired){

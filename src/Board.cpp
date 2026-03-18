@@ -99,14 +99,13 @@ Board::Board(){
     explosionPosition = {0, 0};
     //offset 2 width 12 pixels tot he right because animation was leaking to the left
     explosionFrameRec = {0, 0, static_cast<float>(Explosion.width/explosionFrameCount)-12, 
-    static_cast<float>(Explosion.height)};
+        static_cast<float>(Explosion.height)};
     explosionCurrentFrame = 0;
     explosionFrameCounter = 0;
     explosionFramesSpeed = 10;
-    explosionFramesSpeed = 10;
     explosionActive = false;
-        //load miss splash 
-        //load miss splash 
+
+    //load miss splash animation sprite sheet
     MissSplashAnimation = LoadTexture("src/assets/poofDrip.png");
     SetTextureFilter(MissSplashAnimation, TEXTURE_FILTER_POINT);
     missSplashFrameCount = 6;
@@ -120,18 +119,16 @@ Board::Board(){
     missSplashPosition = {0, 0};
     missSplashCurrentFrame = 0;
     missSplashFrameCounter = 0;
-    missSplashFramesSpeed = 14;
-    missSplashFramesSpeed = 14;
+    missSplashFramesSpeed = 10;
     missSplashActive = false;
 
     //Load sounds
     MissSplash = LoadSound("src/assets/missSplash.mp3");
     HitBoom = LoadSound("src/assets/HitExplosion.mp3");
 
-    //Load sounds
-    MissSplash = LoadSound("src/assets/missSplash.mp3");
-    HitBoom = LoadSound("src/assets/HitExplosion.mp3");
 }
+
+// *********************** Animation Related Functions ***************************************
 
 void Board::UpdateAnimations(){
     if(explosionActive){
@@ -217,6 +214,8 @@ void Board::StartMissSplashAtTile(int row, int col){
     missSplashActive = true;
 }
 
+// *********************** End Animation Related Functions ***************************************
+
 
 //draws the players board, 
 void Board::Draw(Vector2 start){
@@ -229,7 +228,6 @@ void Board::Draw(Vector2 start){
     int fontSize = 20;
     float offsetTop = 30;
     float offsetLeft = 30;
-
     // Column labels: A-J (bottom)
     for (int col = 0; col < 10; col++) {
         char letter = 'A' + col;
@@ -247,34 +245,28 @@ void Board::Draw(Vector2 start){
                 fontSize,
                 BLACK);
     }
-
-
-        // assign all tiles appropriate width, height,  and position 
-        for(int row = 0; row<10; row++){
-            TileX = start.x;  // Reset X at the start of each row
-            for(int col = 0; col<10; col++){
-                grid.at(row).at(col).rect.width = TileWidth;
-                grid.at(row).at(col).rect.height = TileHeight;
-                grid.at(row).at(col).rect.x = TileX;
-                grid.at(row).at(col).rect.y = TileY;
-                grid.at(row).at(col).Draw();
-                TileX += TileWidth;  // Move to next column
-            
-            }
-            TileY += TileHeight;  // Move to next row
+    // assign all tiles appropriate width, height,  and position 
+    for(int row = 0; row<10; row++){
+        TileX = start.x;  // Reset X at the start of each row
+        for(int col = 0; col<10; col++){
+            grid.at(row).at(col).rect.width = TileWidth;
+            grid.at(row).at(col).rect.height = TileHeight;
+            grid.at(row).at(col).rect.x = TileX;
+            grid.at(row).at(col).rect.y = TileY;
+            grid.at(row).at(col).Draw();
+            TileX += TileWidth;  // Move to next column
         }
-
+        TileY += TileHeight;  // Move to next row
+    }
 }
 
 
 void Board::DrawHitsAndMiss(Vector2 start){
-    // assign all tiles appropriate width, height,  and position 
-        for(int row = 0; row<10; row++){
-            for(int col = 0; col<10; col++){
-                grid.at(row).at(col).drawHitsAndMiss();
-            }
+    for(int row = 0; row<10; row++){
+        for(int col = 0; col<10; col++){
+            grid.at(row).at(col).drawHitsAndMiss();
         }
-
+    }
 }
 
 /* Trackingboard funciton calls this funciton,
@@ -292,42 +284,38 @@ bool Board::HandleFire(ShotResult& result, position& at){
         for(int col = 0; col<10; col++){
             if(grid.at(row).at(col).isClicked()){
                 TileState thisTileState = grid.at(row).at(col).state;
-                switch (thisTileState)
-                {
-                case TileState::Empty:
-                    grid.at(row).at(col).state = TileState::Miss;// update tile state on board to hit.
-                    result = ShotResult::Miss;
-                    at.col = col;
-                    at.row = row;
-                    at.hit = false;
-                    //play miss fire sound
-                    PlaySound(MissSplash);
-                    //play miss fire sound
-                    PlaySound(MissSplash);
-                    StartMissSplashAtTile(row, col);
-                    return true;
-                    break;
-                case TileState::Ship:
-                    grid.at(row).at(col).state = TileState::Hit;// update tile state on board to hit.
-                    result = ShotResult::Hit;
-                    at.col = col;
-                    at.row = row;
-                    at.hit = true;
-                    PlaySound(HitBoom);
-                    PlaySound(HitBoom);
-                    StartExplosionAtTile(row, col);
-                    return true;
-                    break;
-                case TileState::Hit:
-                case TileState::Miss:
-                    result = ShotResult::AlreadyFired;
-                    at.col = col;
-                    at.row = row;
-                    at.hit = true;
-                    return true;
-                    break;
+                switch (thisTileState){
+                    case TileState::Empty:
+                        grid.at(row).at(col).state = TileState::Miss;// update tile state on board to hit.
+                        result = ShotResult::Miss;
+                        at.col = col;
+                        at.row = row;
+                        at.hit = false;
+                        //play miss fire sound
+                        PlaySound(MissSplash);
+                        StartMissSplashAtTile(row, col);
+                        return true;
+                        break;
+                    case TileState::Ship:
+                        grid.at(row).at(col).state = TileState::Hit;// update tile state on board to hit.
+                        result = ShotResult::Hit;
+                        at.col = col;
+                        at.row = row;
+                        at.hit = true;
+                        PlaySound(HitBoom);
+                        PlaySound(HitBoom);
+                        StartExplosionAtTile(row, col);
+                        return true;
+                        break;
+                    case TileState::Hit:
+                    case TileState::Miss:
+                        result = ShotResult::AlreadyFired;
+                        at.col = col;
+                        at.row = row;
+                        at.hit = true;
+                        return true;
+                        break;
                 }
-
             }
         }
     }

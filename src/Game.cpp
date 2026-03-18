@@ -156,11 +156,7 @@ void Game::drawP1Turn(){
     // render tracking board with info about other players board.
     // handle click on tracking board, if it is clicked it will result in true and log the result
     ShotResult result;
-<<<<<<< HEAD
     if (player2.drawTrackingBoard(result)) {//if the player made a shot then it will be true and we log if it is a hit or miss, go to the next game state
-=======
-    if (player2.drawTrackingBoard(result)) {
->>>>>>> 84d336267acdbbbc6005e0daf12f0fdbf3fe35be
         CurrResult = result;
         // Immediately check if Player 2 has lost after Player 1 fires.
         // If all of Player 2's ships are sunk, transition directly to GameOver
