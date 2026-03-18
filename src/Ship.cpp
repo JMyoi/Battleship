@@ -8,8 +8,8 @@ using namespace std;
 
 Ship::Ship(int size){
     this->size = size;
-    direction = Direction::Vertical; // by default. 
-    int height = 50*size;
+    direction = Direction::Vertical; // by default, may change during setup phase
+    int height = 50 * size;
     shipRect = {0, 0, 50, float(height)};
     positions.resize(size);
     for(int i = 0; i< positions.size(); i++){
@@ -20,7 +20,6 @@ Ship::Ship(int size){
     //load the ace sound
     Ace = LoadSound("src/assets/Sovereign Ace.mp3");
     // assign the correct image based on size
-    //adjust to vertical default and correct size.
     Image img;
     switch (size)
     {
@@ -84,7 +83,7 @@ void Ship::drawShip(Vector2 newPos){
     DrawTextureV(sprite, newPos, WHITE);
     //DrawRectangleLinesEx(shipRect, 1, BLACK);
 }
-
+// used during setup phase for horizontal placement
 void Ship::drawShipHorizontal(Vector2 newPos){
     //make ship rectangle horizontal, height = 50, width = 50*size
     int width = 50*size;
@@ -101,30 +100,14 @@ void Ship::drawShipHorizontal(Vector2 newPos){
     //DrawRectangleLinesEx(shipRect, 1, BLACK);
 }
 
-
-void Ship::draw(){
-    // draw the ship that has a position set from placement. 
-    //DrawRectangleLinesEx(shipRect, 1, BLACK);
-    //DrawText(to_string(size).c_str(), shipRect.x, shipRect.y, 20, BLACK);
-    Vector2 pos = {shipRect.x, shipRect.y};
-    DrawTextureV(sprite, pos, WHITE);
-
-}
-
-void Ship::drawSunken(){
-    //draw ship with low opacity shifted to the right, so it lands on tracking board
-    float newX = 550 + shipRect.x;
-    Vector2 pos = {newX, shipRect.y};
-    DrawTextureV(sprite, pos, {255,255,255,200});
-}
-
+//used for setup phase
 bool Ship::shipClicked(){
     if(!isPlaced() && CheckCollisionPointRec(GetMousePosition(),shipRect) && IsMouseButtonPressed(MOUSE_LEFT_BUTTON)){
         return true;
     }
     return false;
 }
-
+// for setup phase
 void Ship::setShip(const vector<position>& newPositions){
     cout<<"Setting New Ship Positions of size: "<<newPositions.size()<<" should be same size as: "<<size<<endl;
     positions = newPositions;
@@ -138,11 +121,19 @@ void Ship::setShip(const vector<position>& newPositions){
     if(direction == Direction::Horizontal){cout<<"Horizontal Direction\n";}else{cout<<"Vertical Direction\n";}
 }
 
+// draw the ship that has a position set from placement. 
+void Ship::draw(){
+    Vector2 pos = {shipRect.x, shipRect.y};
+    DrawTextureV(sprite, pos, WHITE);
+}
+
+
 bool Ship::isPlaced(){
     if(positions.at(0).row != -1)
         return true;
     return false;
 }
+
 void Ship::playAce(){
     PlaySound(Ace);
 }
@@ -164,6 +155,14 @@ void Ship::shipHitAt(position pos){
         }
     }
 }
+
+void Ship::drawSunken(){
+    //draw ship with low opacity shifted to the right, so it lands on tracking board
+    float newX = 550 + shipRect.x;
+    Vector2 pos = {newX, shipRect.y};
+    DrawTextureV(sprite, pos, {255,255,255,200});
+}
+
 bool Ship::isSunk(){
     bool sunk = true;// assume true first and if any are not hit then we set to false.
     for(position& pos: positions){

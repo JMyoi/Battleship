@@ -41,7 +41,6 @@ void Tile::UnloadSharedTextures() {
 Tile::Tile(){
     rect = {0,0,0,0}; 
     state = TileState::Empty;
-
     LoadSharedTexturesOnce();
     
 }
