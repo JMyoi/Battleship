@@ -294,7 +294,7 @@ void Game::drawAITurn(){
         if(player1.checkGameOver()){
             state = GameState::GameOver;
         } else {
-            state = GameState::P1Transition;
+            state = GameState::TurnP1;
         }
     }
 }
