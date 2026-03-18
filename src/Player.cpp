@@ -198,6 +198,7 @@ void Player::placeShipsRandomly(){
             vector<position> newPositions(shipSize);
             if(playerBoard.PlaceShipAt(row, col, shipSize, newPositions, dir, errMsg)){
                 ships.at(i).setShip(newPositions);
+                ships.at(i).setDirection(dir); // sync sprite orientation with placement direction
                 placed = true;
             }
         }

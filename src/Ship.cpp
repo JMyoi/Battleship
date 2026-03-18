@@ -69,6 +69,25 @@ Ship::Ship(int size){
 
 int Ship::getSize() const { return size; }
 
+// Rotates the sprite and updates shipRect dimensions to match the given direction.
+// Uses the same rotation logic as drawShip/drawShipHorizontal but without rendering.
+void Ship::setDirection(Direction dir){
+    if(dir == direction) return; // already correct, nothing to do
+    direction = dir;
+    Image img = LoadImageFromTexture(sprite);
+    if(dir == Direction::Horizontal){
+        ImageRotate(&img, -90);
+        shipRect.width  = 50.0f * size;
+        shipRect.height = 50.0f;
+    } else {
+        ImageRotate(&img, 90);
+        shipRect.width  = 50.0f;
+        shipRect.height = 50.0f * size;
+    }
+    sprite = LoadTextureFromImage(img);
+    UnloadImage(img);
+}
+
 // draws ship for setup phase vertical version
 void Ship::drawShip(Vector2 newPos){
     // make ship rectangle vertical, in case it was horizontal and switches back

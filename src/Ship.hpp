@@ -22,6 +22,7 @@ class Ship{
         void draw(); // draw the ship that has a position set from placement. 
         void drawSunken();
         int getSize() const;
+        void setDirection(Direction dir); // rotates sprite and updates shipRect dimensions to match direction
         bool shipClicked();
         bool isPlaced();
         void shipHitAt(position pos);
