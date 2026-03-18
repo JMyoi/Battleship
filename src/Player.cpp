@@ -14,11 +14,10 @@ Player::Player(int shipCount){
     }
     shotPendingTransition = false;
     pendingShotResult = ShotResult::AlreadyFired;
-    // initialize name
 }
 
 int selectedShip = -1; // global varuable for setup, holds what ship is clicked on to be placed on the board.
-Direction direction = Direction::Vertical;
+Direction direction = Direction::Vertical; // global variable to store direction of ship to be placed
 string ErrorMessage = "";// might need to be placed as a global variable because every frame this is reassigned to empty
 // draws the players setup board, logic for handling ship placement and ship displaying on board and out of board for seleciton and placement.
 bool Player::drawSetupBoard(){
@@ -40,6 +39,11 @@ bool Player::drawSetupBoard(){
             }
         }
     }
+
+    //Display r to rotate text
+    char RotateText[] = "Press R to Rotate";
+    DrawText(RotateText, (GetScreenWidth()/2 + 50), 500, 25, BLACK);
+
     // handle click and drag of ships ship placement on board detection.
     if(selectedShip>=0){
         //Logic for Rotating ship with R and displaying the right orientation, based on direction.
@@ -54,7 +58,7 @@ bool Player::drawSetupBoard(){
             ships.at(selectedShip).drawShipHorizontal({GetMousePosition().x - 25, GetMousePosition().y - 25});
         }
         vector<position> newPositions(selectedShip+1);
-        if(playerBoard.HandlePlaceShip(selectedShip+1, newPositions, direction, ErrorMessage)){// should pass in Direction as another parameter
+        if(playerBoard.HandlePlaceShip(selectedShip+1, newPositions, direction, ErrorMessage)){
             // update the players respective ships position if the placement on board was successfull..
             ships.at(selectedShip).setShip(newPositions);
             selectedShip = -1; // deselect after successful placement
@@ -65,11 +69,6 @@ bool Player::drawSetupBoard(){
             DrawText(ErrorMessage.c_str(), (GetScreenWidth()/2 + 50), 600, 15, RED);
         }
     }
-
-    //Display r to rotate text
-    char RotateText[] = "Press R to Rotate";
-    DrawText(RotateText, (GetScreenWidth()/2 + 50), 500, 25, BLACK);
-
     //display ready button
     int centerX = GetScreenWidth()/2;
     // Ready button
@@ -95,7 +94,8 @@ void Player::drawBoard(){
     playerBoard.Draw(start);
     drawShipsonBoard();
     playerBoard.DrawHitsAndMiss(start);
-    //draw how much Ships are sunk
+
+    //draw ratio of how much Ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
         if(ship.isSunk())
@@ -115,6 +115,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
     Vector2 start = {600, 100};
     playerBoard.Draw(start);
     playerBoard.UpdateAnimations();
+
     //draw how much ships are sunk
     int sunkCount = 0;
     for(Ship& ship: ships){
@@ -123,9 +124,6 @@ bool Player::drawTrackingBoard(ShotResult& res){
             ship.drawSunken(); // parameter for fading the ship, tint fre
         }
     }
-    playerBoard.DrawHitsAndMiss(start);// should draw here and be rendered last after the board and the sunken ships
-    playerBoard.DrawExplosion(); // will only draw when active
-    playerBoard.DrawMissSplashAnimation();
     string sunkText = (to_string(sunkCount) + "/"+ to_string(ships.size())+" Ships Sunk");
     float TileHeight = 50;
     float bottomOfGrid = start.y + 10 * TileHeight;
@@ -134,6 +132,10 @@ bool Player::drawTrackingBoard(ShotResult& res){
     (int)(bottomOfGrid + 45),
     25, BLACK);
 
+    playerBoard.DrawHitsAndMiss(start);// Hits and misses rendered after the board and the sunken ships
+    //animation handling 
+    playerBoard.DrawExplosion(); // will only draw when active
+    playerBoard.DrawMissSplashAnimation();
     if(shotPendingTransition){
         if(!playerBoard.IsShotAnimationActive()){
             res = pendingShotResult;
@@ -145,7 +147,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
     }
 
     //handle click on tile.
-    ShotResult result; // result will be put here, hit, miss, alreadyFired
+    ShotResult result; // result of the shot will be put here, hit, miss, alreadyFired
     position pos; // position at the fire attempt will be stored here, row, col, hit.
     if(playerBoard.HandleFire(result, pos)){
         if(result == ShotResult::Hit){
@@ -158,7 +160,7 @@ bool Player::drawTrackingBoard(ShotResult& res){
                     if(ship.isSunk()){
                         ship.playAce();
                     }
-                    
+                    break; // ship hit regestered, no need to interate through other ships.
                 }
             }
             pendingShotResult = result;
@@ -206,8 +208,6 @@ bool Player::checkGameOver(){
 //helper funcitons.
 
 void Player::drawShipsonBoard(){
-    // should draw the ships on the board if there are any ships that are placed on the board.
-    //the above funciton should call this one to display ships that are already placed.
     for(int i = 0; i<ships.size(); i++){
         if(ships.at(i).isPlaced()){
             ships.at(i).draw();
