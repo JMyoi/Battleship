@@ -42,6 +42,10 @@ bool Player::drawSetupBoard(){
             }
         }
     }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 84d336267acdbbbc6005e0daf12f0fdbf3fe35be
     //Display r to rotate text
     char RotateText[] = "Press R to Rotate";
     DrawText(RotateText, (GetScreenWidth()/2 + 50), 500, 25, BLACK);
@@ -120,7 +124,11 @@ bool Player::drawTrackingBoard(ShotResult& res){
     playerBoard.Draw(start);
     playerBoard.UpdateAnimations();
 
+<<<<<<< HEAD
     //draw the sunken ships on tracking board and also the ratio of sunken ships.
+=======
+    //draw how much ships are sunk
+>>>>>>> 84d336267acdbbbc6005e0daf12f0fdbf3fe35be
     int sunkCount = 0;
     for(Ship& ship: ships){
         if(ship.isSunk()){

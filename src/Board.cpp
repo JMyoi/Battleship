@@ -103,7 +103,9 @@ Board::Board(){
     explosionCurrentFrame = 0;
     explosionFrameCounter = 0;
     explosionFramesSpeed = 10;
+    explosionFramesSpeed = 10;
     explosionActive = false;
+        //load miss splash 
         //load miss splash 
     MissSplashAnimation = LoadTexture("src/assets/poofDrip.png");
     SetTextureFilter(MissSplashAnimation, TEXTURE_FILTER_POINT);
@@ -119,7 +121,12 @@ Board::Board(){
     missSplashCurrentFrame = 0;
     missSplashFrameCounter = 0;
     missSplashFramesSpeed = 14;
+    missSplashFramesSpeed = 14;
     missSplashActive = false;
+
+    //Load sounds
+    MissSplash = LoadSound("src/assets/missSplash.mp3");
+    HitBoom = LoadSound("src/assets/HitExplosion.mp3");
 
     //Load sounds
     MissSplash = LoadSound("src/assets/missSplash.mp3");
@@ -259,6 +266,7 @@ void Board::Draw(Vector2 start){
 
 }
 
+
 void Board::DrawHitsAndMiss(Vector2 start){
     // assign all tiles appropriate width, height,  and position 
         for(int row = 0; row<10; row++){
@@ -294,6 +302,8 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.hit = false;
                     //play miss fire sound
                     PlaySound(MissSplash);
+                    //play miss fire sound
+                    PlaySound(MissSplash);
                     StartMissSplashAtTile(row, col);
                     return true;
                     break;
@@ -303,6 +313,7 @@ bool Board::HandleFire(ShotResult& result, position& at){
                     at.col = col;
                     at.row = row;
                     at.hit = true;
+                    PlaySound(HitBoom);
                     PlaySound(HitBoom);
                     StartExplosionAtTile(row, col);
                     return true;

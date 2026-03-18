@@ -53,6 +53,7 @@ class Board{
         int explosionFrameCounter;
         int explosionFramesSpeed;
         int explosionFrameCount;
+        int explosionFrameCount;
         bool explosionActive;
 
         Texture2D MissSplashAnimation;
