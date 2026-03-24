@@ -2,13 +2,20 @@ Battleship Game
 
 CSC 710 – Software Engineering Course Project
 
-This project implements the classic two-player Battleship game using C++ with a graphical user interface built using the Raylib library. The system follows the traditional Battleship game rules where players place ships on a 10×10 board and take turns firing at the opponent’s board until all ships are destroyed.
+This project implements the classic two-player Battleship game using C++ with a graphical user interface built using the Raylib library. The system follows the traditional Battleship rules where players place ships on a 10×10 board and take turns firing at the opponent’s board until all ships are destroyed.
 
-The project demonstrates modular software design, separation of game logic and user interface, and collaborative development using GitHub.
+In this enhanced version, an AI opponent with multiple difficulty levels is introduced, along with additional gameplay improvements and system refinements.
+
+The project demonstrates modular software design, separation of game logic and user interface, AI integration, and collaborative development using GitHub.
 
 Game Features
 
 Two-player Battleship gameplay
+
+AI opponent with three difficulty levels:
+Easy (random shots)
+Medium (targeted adjacent attacks after a hit)
+Hard (guaranteed hit each turn)
 
 10×10 game board (columns A–J, rows 1–10)
 
