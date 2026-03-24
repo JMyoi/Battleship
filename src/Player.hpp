@@ -17,7 +17,8 @@ class Player{
         void placeShipsRandomly(); // AI setup: randomly places all ships on the board with legal placement
         void startReceivingFire(int row, int col, ShotResult& result); // AI fires at this player — fires board, registers hit on ship, starts animation
         bool drawBoardAITurn(); // draws own board during AI turn with animations; returns true when animation finishes
-        
+        vector<vector<Tile>> getBoard(){return playerBoard.getGrid();}
+        bool shipAtTileSunk(int row, int col);
     private:
         Board playerBoard;
         vector<Ship> ships;

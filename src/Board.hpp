@@ -43,6 +43,7 @@ class Board{
         void DrawExplosion();
         void DrawMissSplashAnimation();
         bool IsShotAnimationActive() const;
+        vector<vector<Tile>> getGrid(){ return grid;}
     private:
         vector<vector<Tile>> grid; // 10 X 10 2D grid of tiles
 
@@ -73,5 +74,4 @@ class Board{
 
         void StartExplosionAtTile(int row, int col);
         void StartMissSplashAtTile(int row, int col);
-
 };

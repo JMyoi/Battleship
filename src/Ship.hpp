@@ -8,12 +8,12 @@ struct position{
     int col;
     bool hit;// for if that ship unit is hit or miss, 
 };
+
 enum class Direction {
     Horizontal, Vertical
 };
 
 class Ship{
-
     public:
         Ship(int size);
         void setShip(const vector<position>& newPositions);// if a ship is placed on the board this is called to set the ships position and direction.

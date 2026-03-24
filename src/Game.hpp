@@ -53,6 +53,4 @@ class Game{
         //helper private function for menu — writes clicked index into `selected`
         void getSelectedOption(vector<Rectangle>& options, int& selected);
 
-        
-
 };

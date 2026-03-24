@@ -105,9 +105,7 @@ void Game::drawMenu() {
 }
 
 
-
-
-void Game::drawP1Setup(){// draw player 1 setup screen
+void Game::drawP1Setup(){ // draw player 1 setup screen
     const char* p1text = "Player 1, place your ships";
     DrawText(p1text, GetScreenWidth() / 2 - MeasureText(p1text, 30) / 2, 10, 30, BLACK);
     if(player1.drawSetupBoard()){
@@ -226,9 +224,9 @@ void Game::drawP2Turn(){
     player2.drawBoard();
     ShotResult result;
     if (player1.drawTrackingBoard(result)) {
-    CurrResult = result;
-    // Immediately check if Player 1 has lost after Player 2 fires.
-    // If all of Player 1's ships are sunk, transition directly to GameOver
+        CurrResult = result;
+        // Immediately check if Player 1 has lost after Player 2 fires.
+        // If all of Player 1's ships are sunk, transition directly to GameOver
     if (player1.checkGameOver()) {
         state = GameState::GameOver;
     } else {
@@ -258,21 +256,50 @@ void Game::drawGameOver(){
 
 
 // Returns a random (row, col) the AI hasn't fired at yet.
-pair<int,int> Game::computeAIShot(){ // based on the gameMode, we will calculate the AI shot position differently
+//Depending on the gameMode, we will have different methods of picking the next shot to fire
+pair<int,int> Game::computeAIShot(){ 
     int row, col;
-    do {
-        row = GetRandomValue(0, 9);
-        col = GetRandomValue(0, 9);
-    } while(aiFiredAt.count({row, col}) > 0); // if the set has a pair of (row, col) already then it has already been fired and so find a new, valid one then exit the loop
-    return {row, col};
+    switch (gameMode){
+        case GameMode::AIEasy:
+            do {
+                row = GetRandomValue(0, 9);
+                col = GetRandomValue(0, 9);
+            } while(aiFiredAt.count({row, col}) > 0); // if the set has a pair of (row, col) already then it has already been fired and so find a new, valid one then exit the loop
+            return {row, col};
+            break;
+        case GameMode::AIMedium:
+            /*
+                Pick random tiles and then if it has hit then commit to sinking that ship
+                guess adjacent tiles and get a hit, keep going until it has sunk
+                we verify if it is sunk with a method called shitAtTileSunk(row, col)
+                    which should check if the ship at that coordinate is sunk
+                if it has sunk a ship it will randomly guess a coordinate that has not been hit again
+            */
+
+
+
+            break;
+        case GameMode::AIHard:
+            //use the player1's board to see where to fire at next for the 
+            vector<vector<Tile>> boardGrid = player1.getBoard();
+            //iteratee over board and return the next tile coordinates that has a ship
+            for(int r = 0; r<10; r++){
+                for(int c = 0; c<10; c++){
+                    if(boardGrid.at(r).at(c).state == TileState::Ship){
+                        row = r; 
+                        col = c;
+                        return {row, col};
+                    }
+                }
+            }
+            break;
+    }
 }
 
 void Game::drawAITurn(){
-
-    //TODO: make separate modes for firing depending on the gameMode data member
-
     // Fire exactly once when we first enter this state
     if(!aiShotPending){
+        //TODO: make separate modes for firing depending on the gameMode data member
         aiLastShot = computeAIShot();
         aiFiredAt.insert(aiLastShot);
         ShotResult result;
