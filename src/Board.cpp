@@ -268,6 +268,87 @@ void Board::DrawHitsAndMiss(Vector2 start){
     }
 }
 
+
+// Fires at a specific (row, col) without requiring a mouse click. Used by AI turn.
+bool Board::FireAt(int row, int col, ShotResult& result, position& at){
+    TileState thisTileState = grid.at(row).at(col).state;
+    switch(thisTileState){
+        case TileState::Empty:
+            grid.at(row).at(col).state = TileState::Miss;
+            result = ShotResult::Miss;
+            at.row = row; at.col = col; at.hit = false;
+            PlaySound(MissSplash);
+            StartMissSplashAtTile(row, col);
+            return true;
+        case TileState::Ship:
+            grid.at(row).at(col).state = TileState::Hit;
+            result = ShotResult::Hit;
+            at.row = row; at.col = col; at.hit = true;
+            PlaySound(HitBoom);
+            StartExplosionAtTile(row, col);
+            return true;
+        case TileState::Hit:
+        case TileState::Miss:
+            result = ShotResult::AlreadyFired;
+            at.row = row; at.col = col; at.hit = true;
+        return true;
+    }
+    return false;
+}
+
+/* Trackingboard funciton calls this funciton,
+should return true only if a tile is clicked
+false otherwise
+should check for clicks on the board and update result parameter accordingly
+if tileSate == Empty, return Miss
+if TileState == Ship, return Hit
+if TileState == Hit, return AlreadyFired
+if TileState == Miss, return AlreadyFired
+should return the tile it has fired at if hit so players ship vector can update it's state.
+*/ 
+bool Board::HandleFire(ShotResult& result, position& at){
+    for(int row = 0; row<10; row++){
+        for(int col = 0; col<10; col++){
+            if(grid.at(row).at(col).isClicked()){
+                TileState thisTileState = grid.at(row).at(col).state;
+                switch (thisTileState){
+                    case TileState::Empty:
+                    grid.at(row).at(col).state = TileState::Miss;// update tile state on board to hit.
+                    result = ShotResult::Miss;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = false;
+                    //play miss fire sound
+                    PlaySound(MissSplash);
+                    StartMissSplashAtTile(row, col);
+                    return true;
+                    break;
+                    case TileState::Ship:
+                    grid.at(row).at(col).state = TileState::Hit;// update tile state on board to hit.
+                    result = ShotResult::Hit;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = true;
+                    PlaySound(HitBoom);
+                    PlaySound(HitBoom);
+                    StartExplosionAtTile(row, col);
+                    return true;
+                    break;
+                    case TileState::Hit:
+                    case TileState::Miss:
+                    result = ShotResult::AlreadyFired;
+                    at.col = col;
+                    at.row = row;
+                    at.hit = true;
+                    return true;
+                    break;
+                }
+            }
+        }
+    }
+    return false;
+}
+   
 // Position-based ship placement — same validation logic as HandlePlaceShip but no mouse click.
 // Used by AI to place ships programmatically.
 bool Board::PlaceShipAt(int row, int col, int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage){
@@ -285,6 +366,7 @@ bool Board::PlaceShipAt(int row, int col, int shipSize, vector<position>& newPos
             }
         }
         currRow = row;
+        //update the grids tiles to have ship state 
         for(int i = 0; i < shipSize; i++){
             grid.at(currRow).at(col).state = TileState::Ship;
             newPositions.at(i).row = currRow;
@@ -312,88 +394,8 @@ bool Board::PlaceShipAt(int row, int col, int shipSize, vector<position>& newPos
     return true;
 }
 
-// Fires at a specific (row, col) without requiring a mouse click. Used by AI turn.
-bool Board::FireAt(int row, int col, ShotResult& result, position& at){
-    TileState thisTileState = grid.at(row).at(col).state;
-    switch(thisTileState){
-        case TileState::Empty:
-            grid.at(row).at(col).state = TileState::Miss;
-            result = ShotResult::Miss;
-            at.row = row; at.col = col; at.hit = false;
-            PlaySound(MissSplash);
-            StartMissSplashAtTile(row, col);
-            return true;
-        case TileState::Ship:
-            grid.at(row).at(col).state = TileState::Hit;
-            result = ShotResult::Hit;
-            at.row = row; at.col = col; at.hit = true;
-            PlaySound(HitBoom);
-            PlaySound(HitBoom);
-            StartExplosionAtTile(row, col);
-            return true;
-        case TileState::Hit:
-        case TileState::Miss:
-            result = ShotResult::AlreadyFired;
-            at.row = row; at.col = col; at.hit = true;
-            return true;
-    }
-    return false;
-}
 
-/* Trackingboard funciton calls this funciton,
-should return true only if a tile is clicked
-false otherwise
-should check for clicks on the board and update result parameter accordingly
-    if tileSate == Empty, return Miss
-    if TileState == Ship, return Hit
-    if TileState == Hit, return AlreadyFired
-    if TileState == Miss, return AlreadyFired
-should return the tile it has fired at if hit so players ship vector can update it's state.
-*/ 
-bool Board::HandleFire(ShotResult& result, position& at){
-    for(int row = 0; row<10; row++){
-        for(int col = 0; col<10; col++){
-            if(grid.at(row).at(col).isClicked()){
-                TileState thisTileState = grid.at(row).at(col).state;
-                switch (thisTileState){
-                    case TileState::Empty:
-                        grid.at(row).at(col).state = TileState::Miss;// update tile state on board to hit.
-                        result = ShotResult::Miss;
-                        at.col = col;
-                        at.row = row;
-                        at.hit = false;
-                        //play miss fire sound
-                        PlaySound(MissSplash);
-                        StartMissSplashAtTile(row, col);
-                        return true;
-                        break;
-                    case TileState::Ship:
-                        grid.at(row).at(col).state = TileState::Hit;// update tile state on board to hit.
-                        result = ShotResult::Hit;
-                        at.col = col;
-                        at.row = row;
-                        at.hit = true;
-                        PlaySound(HitBoom);
-                        PlaySound(HitBoom);
-                        StartExplosionAtTile(row, col);
-                        return true;
-                        break;
-                    case TileState::Hit:
-                    case TileState::Miss:
-                        result = ShotResult::AlreadyFired;
-                        at.col = col;
-                        at.row = row;
-                        at.hit = true;
-                        return true;
-                        break;
-                }
-            }
-        }
-    }
-    return false;
-}
-
-//returns the positions where it was placed.
+//returns the positions where it was placed in parameter.
 bool Board::HandlePlaceShip(int shipSize, vector<position>& newPositions, Direction direction, string& ErrorMessage){
     for(int row = 0; row<10; row++){
         for(int col = 0; col<10; col++){

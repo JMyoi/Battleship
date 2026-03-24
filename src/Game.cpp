@@ -60,7 +60,7 @@ void Game::drawMenu() {
     // --- Difficulty row (always drawn; disabled/greyed when 1v1 is selected) ---
     bool aiMode = (selectedMode == 1);
     const char* diffLabel = "Select Difficulty";
-    DrawText(diffLabel, centerX - MeasureText(diffLabel, 20) / 2, 360, 20, aiMode ? BLACK : GRAY);
+    DrawText(diffLabel, centerX - MeasureText(diffLabel, 20) / 2, 360, 20, (aiMode ? BLACK : GRAY));
 
     // [Easy] [Medium] [Hard] — 90px each, 10px gap, total 290px centered
     vector<Rectangle> diffOptions(3);
@@ -68,11 +68,11 @@ void Game::drawMenu() {
     diffOptions[1] = {(float)(centerX -  45), 385, 90, 45}; // Medium
     diffOptions[2] = {(float)(centerX +  55), 385, 90, 45}; // Hard
 
-    if (aiMode) getSelectedOption(diffOptions, selectedDifficulty);
+    if(aiMode) getSelectedOption(diffOptions, selectedDifficulty);
 
     for (int i = 0; i < 3; i++) {
-        Color bg = !aiMode ? Fade(LIGHTGRAY, 0.5f)
-                           : (selectedDifficulty == i ? GRAY : LIGHTGRAY);
+        // if not ai mode then fade the rectangles, if it is ai mode then the selected difficulty rectangle should be darkened
+        Color bg = !aiMode ? Fade(LIGHTGRAY, 0.5f) : (selectedDifficulty == i ? GRAY : LIGHTGRAY);
         DrawRectangleRec(diffOptions[i], bg);
     }
     DrawText("Easy",   diffOptions[0].x + 20, diffOptions[0].y + 12, 20, aiMode ? BLACK : GRAY);
@@ -81,8 +81,7 @@ void Game::drawMenu() {
 
     // --- Start button ---
     // Active only when ship count, mode, and (if AI) difficulty are all chosen
-    bool canStart = selectedOption != -1 && selectedMode != -1 &&
-                    (!aiMode || selectedDifficulty != -1);
+    bool canStart = (selectedOption != -1) && (selectedMode != -1) && (!aiMode || selectedDifficulty != -1);// if not ai mode then it is 1v1 local mode, ok to start, if it is then there is a selected Difficulty for AI mode then also ok to start
 
     Rectangle startButton = {(float)(centerX - 50), 460, 100, 50};
     DrawRectangleRec(startButton, canStart ? LIGHTGRAY : Fade(LIGHTGRAY, 0.4f));
@@ -93,9 +92,9 @@ void Game::drawMenu() {
         if (selectedMode == 0) {
             gameMode = GameMode::LocalPvP;
         } else {
-            if      (selectedDifficulty == 0) gameMode = GameMode::AIEasy;
+            if(selectedDifficulty == 0) gameMode = GameMode::AIEasy;
             else if (selectedDifficulty == 1) gameMode = GameMode::AIMedium;
-            else                              gameMode = GameMode::AIHard;
+            else gameMode = GameMode::AIHard;
         }
         state = GameState::SetupP1;
         player1 = Player(NoOfShips);
@@ -144,18 +143,18 @@ void Game::drawP2Setup(){
 }
 
 void Game::drawP1Transition(){
-    // result from players shot, 
+    // result from players shot,
     switch (CurrResult){
-    case ShotResult::Hit:
-        DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
-        break;
-    case ShotResult::Miss:
-        DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
-        break;
-    case ShotResult::AlreadyFired:
-        //do nothing, this case happens for the first turn only, 
-        break;   
-     }
+        case ShotResult::Hit:
+            DrawText("You've Hit!", GetScreenWidth() / 2 - MeasureText("You've Hit!", 30) / 2, 200, 30, GREEN);
+            break;
+        case ShotResult::Miss:
+            DrawText("You've Missed!", GetScreenWidth() / 2 - MeasureText("You've Missed!", 30) / 2, 200, 30, RED);
+            break;
+        case ShotResult::AlreadyFired:
+            //do nothing, this case happens for the first turn only, 
+            break;   
+    }
     const char* text = "Player 1 Ready?";
     DrawText(text, GetScreenWidth() / 2 - MeasureText(text, 30) / 2, 300, 30, BLACK);
     // Ready Button
@@ -259,16 +258,19 @@ void Game::drawGameOver(){
 
 
 // Returns a random (row, col) the AI hasn't fired at yet.
-pair<int,int> Game::computeAIShot(){
+pair<int,int> Game::computeAIShot(){ // based on the gameMode, we will calculate the AI shot position differently
     int row, col;
     do {
         row = GetRandomValue(0, 9);
         col = GetRandomValue(0, 9);
-    } while(aiFiredAt.count({row, col}) > 0);
+    } while(aiFiredAt.count({row, col}) > 0); // if the set has a pair of (row, col) already then it has already been fired and so find a new, valid one then exit the loop
     return {row, col};
 }
 
 void Game::drawAITurn(){
+
+    //TODO: make separate modes for firing depending on the gameMode data member
+
     // Fire exactly once when we first enter this state
     if(!aiShotPending){
         aiLastShot = computeAIShot();
@@ -277,17 +279,21 @@ void Game::drawAITurn(){
         player1.startReceivingFire(aiLastShot.first, aiLastShot.second, result);
         aiShotPending = true;
     }
-
     // Labels
     const char* header = "Enemy Turn";
     DrawText(header, GetScreenWidth() / 2 - MeasureText(header, 30) / 2, 10, 30, BLACK);
     const char* boardLabel = "My Board";
     DrawText(boardLabel, GetScreenWidth()/4 - MeasureText(boardLabel, 25)/2, 70, 25, BLACK);
+    const char* TargetBoard = "Target Board";
+    DrawText(TargetBoard,((GetScreenWidth()/4)*3 - MeasureText(TargetBoard,25)/2), 70,  25, BLACK);
 
     // Show where the AI fired
     const char* fireMsg = TextFormat("Enemy fires at %c%d!", (char)('A' + aiLastShot.second), aiLastShot.first + 1);
     DrawText(fireMsg, GetScreenWidth()/2 - MeasureText(fireMsg, 22)/2, 680, 22, RED);
 
+    ShotResult result; // useless in this funcition, just to show the tracking board on ai turn 
+    player2.drawTrackingBoard(result);
+    
     // Draw player 1's board with the incoming hit animation
     if(player1.drawBoardAITurn()){
         aiShotPending = false;

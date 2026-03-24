@@ -33,7 +33,6 @@ The existing `selectedOption` pattern (click → highlight gray) is reused for e
 ---
 
 ## New GameState Values
-
 Add two new states to the `GameState` enum:
 
 - **`SetupAI`** — AI randomly places its ships (no human interaction, instant)

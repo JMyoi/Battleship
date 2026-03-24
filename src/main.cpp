@@ -51,8 +51,6 @@ int main(void)
     while (!WindowShouldClose())
     {
         UpdateMusicStream(BGM);
-
-        //2. Draw
         BeginDrawing();
             ClearBackground(RAYWHITE);
     
@@ -118,8 +116,6 @@ int main(void)
                     game.drawGameOver();
                     break;
             }
-
-
         EndDrawing();
     }
 

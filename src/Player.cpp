@@ -16,8 +16,6 @@ Player::Player(int shipCount){
     pendingShotResult = ShotResult::AlreadyFired;
 }
 
-
-
 int selectedShip = -1; // global varuable for setup, holds what ship is clicked on to be placed on the board.
 Direction direction = Direction::Vertical; // global variable to store direction of ship to be placed
 string ErrorMessage = "";// might need to be placed as a global variable because every frame this is reassigned to empty
