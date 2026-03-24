@@ -12,7 +12,7 @@ int selectedMode = -1;       // 0 = 1v1 Local,  1 = vs AI
 int selectedDifficulty = -1; // 0 = Easy,  1 = Medium,  2 = Hard  (only used when selectedMode == 1)
 
 //constructor
-Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired}, aiShotPending(false), aiLastShot{0,0} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired}, aiShotPending(false), aiLastShot{-1,-1} {}
 
 GameState Game::getGameState(){
     return state;
@@ -260,14 +260,15 @@ void Game::drawGameOver(){
 pair<int,int> Game::computeAIShot(){ 
     int row, col;
     switch (gameMode){
-        case GameMode::AIEasy:
+        case GameMode::AIEasy: {
             do {
                 row = GetRandomValue(0, 9);
                 col = GetRandomValue(0, 9);
             } while(aiFiredAt.count({row, col}) > 0); // if the set has a pair of (row, col) already then it has already been fired and so find a new, valid one then exit the loop
             return {row, col};
             break;
-        case GameMode::AIMedium:
+        }
+        case GameMode::AIMedium: {
             /*
                 Pick random tiles and then if it has hit then commit to sinking that ship
                 guess adjacent tiles and get a hit, keep going until it has sunk
@@ -275,11 +276,51 @@ pair<int,int> Game::computeAIShot(){
                     which should check if the ship at that coordinate is sunk
                 if it has sunk a ship it will randomly guess a coordinate that has not been hit again
             */
-
-
-
+            vector<vector<Tile>> boardGrid = player1.getBoard();
+            bool firstTurn = (aiLastShot.first == -1 && aiLastShot.second == -1); // it is the first ai turn if aiLast shot has {-1, -1}
+            bool lastShotHit;
+            bool lastShotSunkShip;
+            if(!firstTurn){  //must use this condition or else it will try to access out of bound on the first turn
+                lastShotHit = (boardGrid.at(aiLastShot.first).at(aiLastShot.second).state == TileState::Hit);
+                lastShotSunkShip = player1.shipAtTileSunk(aiLastShot.first, aiLastShot.second);
+                cout<<"last shot hit: "<<lastShotHit<<" lastShotSunkShip: "<<lastShotSunkShip <<endl;
+            }
+            /* if is the not the first turn, and last shot hit and the last shot if it was a hit did not sink a ship,
+            then we should try to sink the current ship
+            else we should move on and guess randonly*/
+            if(!firstTurn && lastShotHit && !lastShotSunkShip){
+                /*
+                //Human Logic way
+                //two parts here, if it's the first hit then we should guess a tile adjacent to it,
+                     left right, up or down
+                //if it is not the first hit and we've previously hit two tiles or more,
+                    continue down the path of the direction hit, until we sink the ship
+                    if we overshoot, we can go back to the boardGrid and go back to the other direction and continue along until we sink the ship
+            
+                */
+                
+                // shorter a bit of cheating way, 
+                //get the ships positions vectors of with getThisTilesShipPositions() 
+                //then start hitting each position until it sinks
+                vector<position> shipPos = player1.getThisTilesShipsPositions(aiLastShot.first, aiLastShot.second);
+                for(int i = 0; i<shipPos.size(); i++){
+                    if(shipPos.at(i).hit == false){
+                        return {shipPos.at(i).row, shipPos.at(i).col};
+                    }
+                }
+            }
+            else{
+                //gets a random row and column
+                cout<<"Medium mode, Guessing randomly\n";
+                do {
+                    row = GetRandomValue(0, 9);
+                    col = GetRandomValue(0, 9);
+                } while(aiFiredAt.count({row, col}) > 0); 
+                return {row, col};
+            }
             break;
-        case GameMode::AIHard:
+        }
+        case GameMode::AIHard: {
             //use the player1's board to see where to fire at next for the 
             vector<vector<Tile>> boardGrid = player1.getBoard();
             //iteratee over board and return the next tile coordinates that has a ship
@@ -293,6 +334,7 @@ pair<int,int> Game::computeAIShot(){
                 }
             }
             break;
+        }
     }
 }
 

@@ -18,7 +18,8 @@ class Player{
         void startReceivingFire(int row, int col, ShotResult& result); // AI fires at this player — fires board, registers hit on ship, starts animation
         bool drawBoardAITurn(); // draws own board during AI turn with animations; returns true when animation finishes
         vector<vector<Tile>> getBoard(){return playerBoard.getGrid();}
-        bool shipAtTileSunk(int row, int col);
+        bool shipAtTileSunk(int row, int col); // used in AI mediummode
+        vector<position> getThisTilesShipsPositions(int row, int col);// returns the vector of positions of a shit that has these coordinates
     private:
         Board playerBoard;
         vector<Ship> ships;

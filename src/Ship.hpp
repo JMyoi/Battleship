@@ -29,7 +29,8 @@ class Ship{
         bool matchingAt(position pos); // returns true if there are any ship unit positions that match the given arguments position.
         bool isSunk();
         void playAce();
-
+        bool hasCoor(int row, int col);
+        vector<position> getShipPositions();
     private:
         int size;
         vector<position> positions;

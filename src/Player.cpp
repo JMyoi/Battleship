@@ -246,6 +246,26 @@ bool Player::drawBoardAITurn(){
     return false;
 }
 
+bool Player::shipAtTileSunk(int row, int col){
+    //traverse all ships till we get a found ship with this tile coordinate
+    for(Ship& ship: ships){
+        //if this ship has a coordinate then we check if it is sunk if it is then return true
+        if(ship.hasCoor(row, col) && ship.isSunk()){
+            return true;
+        }
+    }
+    return false;
+}
+
+vector<position> Player::getThisTilesShipsPositions(int row, int col){
+     for(Ship& ship: ships){
+        if(ship.hasCoor(row, col)){
+            return ship.getShipPositions();
+        }
+    }
+}
+
+
 bool Player::checkGameOver(){
     //check if all ships are sunk
     bool allSunk = true;// assume true first

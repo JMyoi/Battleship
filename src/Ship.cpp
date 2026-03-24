@@ -193,4 +193,17 @@ bool Ship::isSunk(){
     return sunk;
 }
 
+//if this ship has this coordinate then return true
+bool Ship::hasCoor(int row, int col){
+    for(int i  = 0; i<positions.size(); i++){
+        if(positions.at(i).row == row && positions.at(i).col == col)
+            return true;
+    }
+    return false;
+}
+
+vector<position> Ship::getShipPositions(){
+    return positions;
+}
+
 
