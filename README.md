@@ -52,16 +52,8 @@ The project follows a layered, modular architecture that cleanly separates game 
 
 The game progresses through a strict sequence of states managed by the `GameState` enum:
 
-```
-Menu
- └─► SetupP1
-      ├─► (1v1) P2SetupTransition ──► SetupP2 ──► P1Transition
-      └─► (AI)  P1Transition  ◄─────────────────────────────────┐
-                   └─► TurnP1                                    │
-                         ├─► (1v1) P2Transition ──► TurnP2 ──►──┘
-                         ├─► (AI)  AITurn ──────────────────►───┘
-                         └─► GameOver
-```
+<img width="621" height="519" alt="image" src="https://github.com/user-attachments/assets/bc4de8da-97fb-4d9d-880a-d40fb9d99021" />
+
 
 In Bot mode, `P2SetupTransition`, `SetupP2`, `P2Transition`, and `TurnP2` are bypassed entirely — the human player never leaves their own screen.
 
