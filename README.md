@@ -1,14 +1,20 @@
 # Battleship
 
-> CSC 710 – Software Engineering Course Project
 
-A fully graphical implementation of the classic **Battleship** game built in **C++** using the **Raylib** library. Two players compete on a 10×10 grid, placing ships and taking turns firing at each other's boards until one fleet is completely destroyed. The game features a complete single-player mode with an AI opponent across three difficulty levels, a polished graphical interface with hit/miss animations, sound effects, and a clean state-driven game flow.
+A fully graphical implementation of the classic **Battleship** game built in **C++** using the **Raylib** library. Two players compete on a 10×10 grid, placing ships and taking turns firing at each other's boards until one fleet is completely destroyed. The game features a Local 1V1 mode (played on the same device) and a complete single-player mode with an AI opponent across three difficulty levels, a polished graphical interface with hit/miss animations, sound effects, and a clean state-driven game flow.
 
 ---
 
 ## Demo
 
-> _Screenshots coming soon — place images here._
+Main Menu
+<img width="1144" height="802" alt="image" src="https://github.com/user-attachments/assets/233b1141-0ef0-47c5-897c-093a1286d9f5" />
+Game Play 
+<img width="1143" height="801" alt="image" src="https://github.com/user-attachments/assets/fc6548b8-7c5e-4a15-ac54-8f249121aa0a" />
+<img width="1141" height="737" alt="image" src="https://github.com/user-attachments/assets/c657437b-a031-4d63-8827-109d6714313b" />
+Game Over
+<img width="1143" height="782" alt="image" src="https://github.com/user-attachments/assets/8faff1ec-047a-4032-bfac-7c6ad61dc7b7" />
+
 
 ---
 
@@ -30,27 +36,8 @@ A fully graphical implementation of the classic **Battleship** game built in **C
 
 The project follows a layered, modular architecture that cleanly separates game logic from rendering. All classes communicate through well-defined interfaces, with the `Game` class acting as the central coordinator.
 
-```
-┌─────────────────────────────────┐
-│             main.cpp            │  Entry point — window init, game loop, state dispatch
-└────────────────┬────────────────┘
-                 │
-        ┌────────▼────────┐
-        │      Game       │  State machine, turn logic, AI control
-        └──┬──────────┬───┘
-           │          │
-    ┌──────▼───┐  ┌───▼──────┐
-    │ Player 1 │  │ Player 2 │  (driven by AI in single-player mode)
-    └──────┬───┘  └───┬──────┘
-           │          │
-        ┌──▼──────────▼──┐
-        │     Board      │  10×10 grid, placement, firing, animations
-        └────────┬───────┘
-                 │
-            ┌────▼────┐
-            │  Ship   │  Size, positions, hit tracking, sunk detection
-            └─────────┘
-```
+<img width="447" height="381" alt="image" src="https://github.com/user-attachments/assets/cd6ff0d2-2a1c-412e-829f-988b82d8ee51" />
+
 
 ### Class Responsibilities
 
@@ -76,13 +63,13 @@ Menu
                          └─► GameOver
 ```
 
-In AI mode, `P2SetupTransition`, `SetupP2`, `P2Transition`, and `TurnP2` are bypassed entirely — the human player never leaves their own screen.
+In Bot mode, `P2SetupTransition`, `SetupP2`, `P2Transition`, and `TurnP2` are bypassed entirely — the human player never leaves their own screen.
 
 ---
 
-## AI Design
+## Bot Design
 
-The AI opponent is integrated directly into the `Game` class and controls `player2` programmatically, requiring no changes to the `Player` or `Board` classes.
+The Bot opponent is integrated directly into the `Game` class and controls `player2` programmatically, requiring no changes to the `Player` or `Board` classes.
 
 ### Ship Placement
 At game start, the AI instantly places all ships using randomized positions and orientations, retrying automatically on any collision or out-of-bounds result.
