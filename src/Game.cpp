@@ -12,7 +12,7 @@ int selectedMode = -1;       // 0 = 1v1 Local,  1 = vs AI
 int selectedDifficulty = -1; // 0 = Easy,  1 = Medium,  2 = Hard  (only used when selectedMode == 1)
 
 //constructor
-Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired}, aiShotPending(false), aiLastShot{-1,-1} {}
+Game::Game() : player1(1), player2(1), state(GameState::Menu), gameMode(GameMode::LocalPvP), NoOfShips(-1), CurrResult{ShotResult::AlreadyFired}, aiShotPending(false), aiLastShot{-1,-1}, aiHunting(false), aiHitAnchor{-1,-1}, aiLockedDir{0,0}, aiExtendFrom{-1,-1} {}
 
 GameState Game::getGameState(){
     return state;
@@ -101,6 +101,10 @@ void Game::drawMenu() {
         player2 = Player(NoOfShips);
         aiShotPending = false;
         aiFiredAt.clear();
+        aiHunting = false;
+        aiHitAnchor = {-1, -1};
+        aiLockedDir  = {0, 0};
+        aiExtendFrom = {-1, -1};
     }
 }
 
@@ -255,8 +259,23 @@ void Game::drawGameOver(){
 
 
 
-// Returns a random (row, col) the AI hasn't fired at yet.
+
 //Depending on the gameMode, we will have different methods of picking the next shot to fire
+
+/*
+easy - pick randomly
+medium - plays much like a human, randomly pick tiles until hit and commit to sinking that ship and then contimue on randomly
+hard - knows where every shit is and will never miss
+
+Every time computeAIShot() is called, it first looks back at what happened last turn, updates state, then picks the next shot:
+
+Hunt — random unfired cell. On a hit → record aiHitAnchor, enter targeting mode
+Target, unlocked — randomly tries one of the unfired orthogonal neighbors of the anchor. On a hit → locks the axis (computes direction vector from anchor to this hit)
+Target, locked — extends one step from aiExtendFrom in the locked direction each turn
+Hit → aiExtendFrom advances forward
+Miss (overshoot) → direction flips, aiExtendFrom resets to anchor, then skips over any neighbors that were already tried in phase 2
+Ship sunk → resets all targeting state back to Hunt
+*/
 pair<int,int> Game::computeAIShot(){ 
     int row, col;
     switch (gameMode){
@@ -269,56 +288,116 @@ pair<int,int> Game::computeAIShot(){
             break;
         }
         case GameMode::AIMedium: {
-            /*
-                Pick random tiles and then if it has hit then commit to sinking that ship
-                guess adjacent tiles and get a hit, keep going until it has sunk
-                we verify if it is sunk with a method called shitAtTileSunk(row, col)
-                    which should check if the ship at that coordinate is sunk
-                if it has sunk a ship it will randomly guess a coordinate that has not been hit again
-            */
-            vector<vector<Tile>> boardGrid = player1.getBoard();
-            bool firstTurn = (aiLastShot.first == -1 && aiLastShot.second == -1); // it is the first ai turn if aiLast shot has {-1, -1}
-            bool lastShotHit;
-            bool lastShotSunkShip;
-            if(!firstTurn){  //must use this condition or else it will try to access out of bound on the first turn
-                lastShotHit = (boardGrid.at(aiLastShot.first).at(aiLastShot.second).state == TileState::Hit);
-                lastShotSunkShip = player1.shipAtTileSunk(aiLastShot.first, aiLastShot.second);
-                cout<<"last shot hit: "<<lastShotHit<<" lastShotSunkShip: "<<lastShotSunkShip <<endl;
-            }
-            /* if is the not the first turn, and last shot hit and the last shot if it was a hit did not sink a ship,
-            then we should try to sink the current ship
-            else we should move on and guess randonly*/
-            if(!firstTurn && lastShotHit && !lastShotSunkShip){
-                /*
-                //Human Logic way
-                //two parts here, if it's the first hit then we should guess a tile adjacent to it,
-                     left right, up or down
-                //if it is not the first hit and we've previously hit two tiles or more,
-                    continue down the path of the direction hit, until we sink the ship
-                    if we overshoot, we can go back to the boardGrid and go back to the other direction and continue along until we sink the ship
-            
-                */
-                
-                // shorter a bit of cheating way, 
-                //get the ships positions vectors of with getThisTilesShipPositions() 
-                //then start hitting each position until it sinks
-                vector<position> shipPos = player1.getThisTilesShipsPositions(aiLastShot.first, aiLastShot.second);
-                for(int i = 0; i<shipPos.size(); i++){
-                    if(shipPos.at(i).hit == false){
-                        return {shipPos.at(i).row, shipPos.at(i).col};
+            // --- Process result of the last shot ---
+            if(aiLastShot.first != -1){
+                vector<vector<Tile>> board = player1.getBoard();
+                bool lastHit  = (board[aiLastShot.first][aiLastShot.second].state == TileState::Hit);
+                bool lastSunk = lastHit && player1.shipAtTileSunk(aiLastShot.first, aiLastShot.second);
+
+                if(lastSunk){
+                    // Ship sunk — back to random hunt
+                    aiHunting   = false;
+                    aiLockedDir = {0, 0};
+                } else if(lastHit){
+                    if(!aiHunting){
+                        // First hit: enter targeting mode
+                        aiHunting    = true;
+                        aiHitAnchor  = aiLastShot;
+                        aiLockedDir  = {0, 0};
+                        aiExtendFrom = aiLastShot;
+                    } else if(aiLockedDir == make_pair(0, 0)){
+                        // Second hit: lock the axis
+                        aiLockedDir  = {aiLastShot.first  - aiHitAnchor.first,
+                                        aiLastShot.second - aiHitAnchor.second};
+                        aiExtendFrom = aiLastShot;
+                    } else {
+                        // Extending along locked axis: advance frontier
+                        aiExtendFrom = aiLastShot;
                     }
+                } else {
+                    // Miss
+                    if(aiHunting && aiLockedDir != make_pair(0, 0)){
+                        // Overshot — reverse direction and restart from anchor
+                        aiLockedDir  = {-aiLockedDir.first, -aiLockedDir.second};
+                        aiExtendFrom = aiHitAnchor;
+                    }
+                    // If unlocked miss, just try another neighbor next turn (no change needed)
                 }
             }
-            else{
-                //gets a random row and column
-                cout<<"Medium mode, Guessing randomly\n";
+
+            // --- Compute next shot ---
+
+            // Hunt mode: pick a random unfired cell
+            if(!aiHunting){
                 do {
                     row = GetRandomValue(0, 9);
                     col = GetRandomValue(0, 9);
-                } while(aiFiredAt.count({row, col}) > 0); 
+                } while(aiFiredAt.count({row, col}) > 0);
                 return {row, col};
             }
-            break;
+
+            // Targeting, direction not locked: pick a random unfired orthogonal neighbor of the anchor
+            if(aiLockedDir == make_pair(0, 0)){
+                vector<pair<int,int>> neighbors = {
+                    {aiHitAnchor.first - 1, aiHitAnchor.second},
+                    {aiHitAnchor.first + 1, aiHitAnchor.second},
+                    {aiHitAnchor.first,     aiHitAnchor.second - 1},
+                    {aiHitAnchor.first,     aiHitAnchor.second + 1}
+                };
+                vector<pair<int,int>> valid;
+                for(auto& n : neighbors){
+                    if(n.first >= 0 && n.first < 10 &&
+                       n.second >= 0 && n.second < 10 &&
+                       !aiFiredAt.count(n)){
+                        valid.push_back(n);
+                    }
+                }
+                if(!valid.empty()){
+                    return valid[GetRandomValue(0, (int)valid.size() - 1)];
+                }
+                // All neighbors exhausted — reset and fall through to random hunt
+                aiHunting = false;
+                do {
+                    row = GetRandomValue(0, 9);
+                    col = GetRandomValue(0, 9);
+                } while(aiFiredAt.count({row, col}) > 0);
+                return {row, col};
+            }
+
+            // Targeting with direction locked: extend frontier one step
+            pair<int,int> next = {aiExtendFrom.first  + aiLockedDir.first,
+                                   aiExtendFrom.second + aiLockedDir.second};
+
+            // If that cell is out of bounds or already fired (e.g. tried as a neighbor earlier),
+            // reverse direction and walk from the anchor, skipping any already-fired cells
+            if(next.first < 0 || next.first >= 10 ||
+               next.second < 0 || next.second >= 10 ||
+               aiFiredAt.count(next)){
+                aiLockedDir  = {-aiLockedDir.first, -aiLockedDir.second};
+                aiExtendFrom = aiHitAnchor;
+                next = {aiHitAnchor.first  + aiLockedDir.first,
+                        aiHitAnchor.second + aiLockedDir.second};
+                // Skip over any cells that were already tried during the neighbor phase
+                while(next.first >= 0 && next.first < 10 &&
+                      next.second >= 0 && next.second < 10 &&
+                      aiFiredAt.count(next)){
+                    aiExtendFrom = next;
+                    next.first  += aiLockedDir.first;
+                    next.second += aiLockedDir.second;
+                }
+                // If we've run out of room in both directions, give up and hunt randomly
+                if(next.first < 0 || next.first >= 10 ||
+                   next.second < 0 || next.second >= 10){
+                    aiHunting   = false;
+                    aiLockedDir = {0, 0};
+                    do {
+                        row = GetRandomValue(0, 9);
+                        col = GetRandomValue(0, 9);
+                    } while(aiFiredAt.count({row, col}) > 0);
+                    return {row, col};
+                }
+            }
+            return next;
         }
         case GameMode::AIHard: {
             //use the player1's board to see where to fire at next for the 
@@ -327,15 +406,17 @@ pair<int,int> Game::computeAIShot(){
             for(int r = 0; r<10; r++){
                 for(int c = 0; c<10; c++){
                     if(boardGrid.at(r).at(c).state == TileState::Ship){
-                        row = r; 
-                        col = c;
-                        return {row, col};
+                        row = r; col = c; 
+                        return {row, col}; 
                     }
                 }
             }
             break;
         }
+        default:
+            break;
     }
+    return {0, 0}; // unreachable in practice (LocalPvP never calls computeAIShot)
 }
 
 void Game::drawAITurn(){

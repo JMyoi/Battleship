@@ -246,6 +246,7 @@ bool Player::drawBoardAITurn(){
     return false;
 }
 
+//is the ship that has this coordinate sunk?
 bool Player::shipAtTileSunk(int row, int col){
     //traverse all ships till we get a found ship with this tile coordinate
     for(Ship& ship: ships){
@@ -257,6 +258,7 @@ bool Player::shipAtTileSunk(int row, int col){
     return false;
 }
 
+//returns a ships positions vector that has these coordinates
 vector<position> Player::getThisTilesShipsPositions(int row, int col){
      for(Ship& ship: ships){
         if(ship.hasCoor(row, col)){

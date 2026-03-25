@@ -30,8 +30,7 @@ class Game{
         void drawP2Turn();
         void drawAITurn();
         void drawGameOver();
-        
-
+    
     private:
         Player player1;
         Player player2;
@@ -43,12 +42,18 @@ class Game{
         //be AlreadyFired to indicate that, assigned by constructor
         ShotResult CurrResult;
 
-        // AI state
+        // AI state — shared
         bool aiShotPending;             // true while waiting for AI shot animation to finish
         pair<int,int> aiLastShot;       // (row, col) of the AI's most recent shot, for display
-        set<pair<int,int>> aiFiredAt;   // tracks every cell the AI has fired at (Easy mode)
+        set<pair<int,int>> aiFiredAt;   // every cell the AI has fired at
 
-        pair<int,int> computeAIShot();  // returns a random unfired (row, col) for Easy AI
+        // Medium AI targeting state (Hunt/Target algorithm)
+        bool aiHunting;              // true = committed to sinking a hit ship
+        pair<int,int> aiHitAnchor;   // position of the first hit on the targeted ship
+        pair<int,int> aiLockedDir;   // direction being extended; {0,0} = not yet locked
+        pair<int,int> aiExtendFrom;  // frontier: the last hit position to extend from
+
+        pair<int,int> computeAIShot();
 
         //helper private function for menu — writes clicked index into `selected`
         void getSelectedOption(vector<Rectangle>& options, int& selected);
